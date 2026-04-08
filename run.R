@@ -30,11 +30,23 @@ cat(sprintf("N = %d, T = %d\n", sdata$N, sdata$T))
 
 # ---- Compile -----------------------------------------------------------------
 
+mod_hyp  <- cmdstan_model("stan/hyp_optimized.stan")
 mod_alt1 <- cmdstan_model("stan/alt1_optimized.stan")
 mod_m1   <- cmdstan_model("stan/mine1_logtrial.stan")
 
 
 # ---- Init functions ----------------------------------------------------------
+
+init_hyp <- function() {
+  list(
+    pop_gamma_g_sd = 0.5, pop_alpha_g_sd = 0.5,
+    pop_beta_gp_g_sd = 0.5, pop_beta_e_g_sd = 0.5,
+    pop_gamma_p_sd = 0.5, pop_alpha_p_sd = 0.5,
+    pop_beta_gp_p_sd = 0.5, pop_beta_e_p_sd = 0.5,
+    pop_gamma_e_sd = 0.5, pop_alpha_e_sd = 0.5, pop_beta_gp_e_sd = 0.5,
+    sigma_g = 1, sigma_p = 1, sigma_e = 1
+  )
+}
 
 # Alt1 (NCP): init SDs and sigma positive
 init_alt1 <- function() {
@@ -51,27 +63,41 @@ init_alt1 <- function() {
 
 # ---- Fit & save --------------------------------------------------------------
 
+fit_hyp <- mod_hyp$sample(
+  data = sdata, chains = 4, parallel_chains = 4,
+  iter_warmup = 1000, iter_sampling = 10000,
+  adapt_delta = 0.99, max_treedepth = 20, seed = 2026,
+  init = init_hyp
+)
+fit_hyp$save_object("models/fit_hyp.rds")
 
 
 fit_alt1 <- mod_alt1$sample(
   data = sdata, chains = 4, parallel_chains = 4,
-  iter_warmup = 1000, iter_sampling = 1000,
-  adapt_delta = 0.95, max_treedepth = 15, seed = 2026,
+  iter_warmup = 1000, iter_sampling = 10000,
+  adapt_delta = 0.99, max_treedepth = 20, seed = 2026,
   init = init_alt1
 )
 fit_alt1$save_object("models/fit_alt1.rds")
 
+
+
 fit_m1 <- mod_m1$sample(
   data = sdata, chains = 4, parallel_chains = 4,
-  iter_warmup = 1000, iter_sampling = 1000,
-  adapt_delta = 0.95, max_treedepth = 15, seed = 2026,
+  iter_warmup = 1000, iter_sampling = 10000,
+  adapt_delta = 0.99, max_treedepth = 20, seed = 2026,
   init = init_alt1
 )
 fit_m1$save_object("models/fit_mine1.rds")
 
+# Though I set at adapt_delta = 0.99, max_treedepth = 20, the model can work 
+# well under 0.95/15.
 
 
 # ---- Diagnostics -------------------------------------------------------------
+
+fit_hyp$cmdstan_diagnose()
+# No problems detected: no divergences, E-BFMI OK, R-hat OK, ESS OK
 
 fit_alt1$cmdstan_diagnose()
 # No problems detected: no divergences, E-BFMI OK, R-hat OK, ESS OK
@@ -79,11 +105,13 @@ fit_alt1$cmdstan_diagnose()
 fit_m1$cmdstan_diagnose()
 # No problems detected: no divergences, E-BFMI OK, R-hat OK, ESS OK
 
+
 # ---- LOO comparison ----------------------------------------------------------
 
+loo_hyp  <- fit_hyp$loo(variables = "log_lik")
 loo_alt1 <- fit_alt1$loo(variables = "log_lik")
 loo_m1   <- fit_m1$loo(variables = "log_lik")
-loo_compare(list(alt1 = loo_alt1, mine1 = loo_m1))
+loo_compare(list(alt1 = loo_alt1, mine1 = loo_m1, hyp = loo_hyp))
 #       elpd_diff se_diff
 # mine1   0.0       0.0
 # alt1  -99.8      12.4
