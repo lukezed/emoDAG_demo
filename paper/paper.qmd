@@ -1,51 +1,63 @@
 ---
-title: "My Title"
-shorttitle: "Short Title in Running Header"
+title: "title"
+shorttitle: "[RUNNING HEADER SHORT TITLE]"
 author:
-  - name: Jane Doe
+  - name: Chi Zhang
     corresponding: true
-    orcid: 0000-0000-0000-0001
-    email: janedoe@generic.edu
+    orcid: 0000-0002-9535-6186
+    email: chi.zhang-3@manchester.ac.uk
     affiliations:
-      - name: Generic University
-        department: Department of Scholarly Studies
-        address: 1234 Capital St.
-        city: New York
-        region: NY
-        country: USA
-        postal-code: 12084-1234
+      - name: The University of Manchester
+        department: Manchester Institute of Education
+        address: Oxford Road
+        city: Manchester
+        region: England
+        country: UK
+        postal-code: M13 9PL
 author-note:
   status-changes: 
-    affiliation-change: ~
-    deceased: ~
+    affiliation-change: null
+    deceased: null
   disclosures:
-    study-registration: ~
-    data-sharing: ~
-    related-report: ~
-    conflict-of-interest: ~
-    financial-support: ~
-    gratitude: ~
-    authorship-agreements: ~
-abstract: "This document is a template."
-impact-statement: "This template helps you get started."
+    study-registration: null
+    data-sharing: null
+    related-report: null
+    conflict-of-interest: "The author states that there is no conflict of interest."
+    financial-support: null
+    gratitude: "The author would like to acknowledge the assistance given by Research IT, and the use of The HPC Pool funded by the Research Lifecycle Programme at The University of Manchester."
+    authorship-agreements: null
+abstract: |
+  1111
 keywords: [Keyword 1, Keyword 2, Keyword 3]
-bibliography: bibliography.bib
+bibliography: reference.bib
 format:
   apaquarto-docx: default
   apaquarto-html: default
-  apaquarto-typst: 
-    keep-typ: true
   apaquarto-pdf:
     documentmode: man
+    floatsintext: true
+    pdf-engine: xelatex
+    keep-tex: true
+    mainfont: "Times New Roman"
+    tbl-cap-location: top
+editor: 
+  markdown: 
+    wrap: 72
+
+header-includes:
+  - \makeatletter
+  - \@ifundefined{cslhangindent}{\newlength{\cslhangindent}}{}
+  - \makeatother
 ---
 
 <!-- The introduction should not have a level-1 heading such as Introduction. -->
 
-This is my first paragraph. Any section headings in the introduction should be in levels 2--5.
+This is my first paragraph. Any section headings in the introduction
+should be in levels 2--5.
 
 ## Section in Introduction
 
-This is a reference [@cohen2003applied].
+This is a reference.
 
 # Method
 
@@ -59,9 +71,184 @@ This is a reference [@cohen2003applied].
 
 # Discussion
 
-## Limitations and Future Directions
+## Model Comparison and Methodological Considerations
+
+We evaluated three models using multiple comparison criteria with
+increasing methodological rigor. The original study employed WAIC for
+model selection without reporting diagnostic checks. Our reanalysis
+revealed that all three models exhibited substantial proportions of
+unreliable pointwise WAIC estimates (\>16% p_waic \> 0.4), calling into
+question the reliability of WAIC-based model comparison in this context.
+We therefore additionally computed PSIS-LOO, which, while more robust
+than WAIC (Vehtari et al., 2017), is theoretically inappropriate for
+autoregressive models because leaving out a single observation still
+allows future data to inform predictions of the past.
+
+To address this, we implemented exact leave-future-out cross-validation
+(LFO-CV; Bürkner et al., 2020), adapted for our panel data structure. At
+each step, the model was fit using data from blocks 1 through *t*, and
+predictive performance was evaluated on block *t*+1 for all participants
+simultaneously. We set L=5 (25% of blocks), ensuring sufficient data for
+stable hierarchical parameter estimation — a more conservative
+proportion than the 12.5% used in Bürkner et al. (2020).
+
+Across all three criteria — WAIC, LOO, and LFO — Mine1 consistently
+emerged as the best-fitting model (Table X). Notably, the advantage of
+Mine1 over Alt1 was considerably attenuated from LOO (ΔELPD = 99.8, SE =
+12.4) to LFO (ΔELPD = 39.54, SE = 19.20). This attenuation is expected:
+the log(trial) trend in Mine1 benefits disproportionately from future
+information leakage under LOO, as future observations provide
+information about the time trend that inflates apparent predictive
+accuracy. The LFO estimate, free from such leakage, represents a more
+honest assessment of the model's predictive advantage.
+
+An additional finding concerns the comparison between Alt1 and the
+Hypothesized model. The original study selected Alt1 over the
+Hypothesized model based on WAIC, concluding that the separate modeling
+of goal success and failure was warranted. Under LFO, however, this
+advantage was not statistically distinguishable (ΔELPD = 38.57, SE =
+33.80). This suggests that controlling for time trends may be more
+consequential for model fit than distinguishing between success and
+failure in the goal equation.
+
+## The Emotion–Performance Link Revisited
+
+The central finding of this reanalysis concerns the emotion →
+performance pathway. Lin et al. (2024) reported a significant negative
+effect (β_E→P = −0.103, 95% HDI \[−0.172, −0.036\]) in their
+best-fitting model (Alt1), which they interpreted through the lens of
+the coasting hypothesis (Carver, 2003): positive emotions signal that
+sufficient progress has been made, leading individuals to reduce effort
+and consequently perform worse.
+
+After introducing a log(trial) learning curve, this effect was
+substantially attenuated and no longer credible (β_E→P = −0.043, 95% CrI
+\[−0.114, 0.028\]). Simultaneously, a strong practice effect emerged
+(β_lt_p = 0.326, 95% CrI \[0.262, 0.393\]), indicating that performance
+improved substantially over the course of the task. This pattern
+suggests that the original negative emotion–performance association may
+reflect a statistical confound rather than a genuine causal process: as
+participants progressed through the repetitive math task, performance
+increased due to practice while emotional engagement declined — two
+independent time trends that, when uncontrolled, produce a spurious
+negative correlation between emotions and performance.
+
+Importantly, the remaining parameters of the model were largely robust
+to this correction. The success/failure asymmetry in goal setting (β_S =
+0.273, β_F = 0.491) and the effect of the goal–performance discrepancy
+on emotions (β_GP→E = 0.128) were virtually unchanged, suggesting that
+the core self-regulation dynamics identified by Lin et al. are genuine.
+It is specifically the emotion → performance pathway that is not robust
+to the inclusion of a time trend.
+
+## Reconciling with Study 2
+
+The interpretation of our findings gains further nuance when considered
+alongside Study 2 of the original paper, in which German medical
+students studied for a high-stakes second state exam over a period of up
+to 40 days using an online learning platform (Breitwieser et al., 2022).
+In contrast to the repetitive math task of Study 1 — where participants
+solved the same type of three-digit arithmetic problems across 20
+two-minute blocks in a single session — Study 2 involved varied learning
+content spread over weeks, with each study session covering different
+medical topics. Furthermore, the task carried substantial personal
+relevance, as performance was directly tied to participants'
+professional futures.
+
+Notably, Lin et al. found that the direction of the emotion →
+performance effect reversed in Study 2: when using postlearning
+emotions, positive emotions predicted *higher* subsequent performance —
+the opposite of Study 1. The authors acknowledged this discrepancy but
+did not offer a unified explanation. Our findings suggest one: in Study
+1's repetitive task, a strong and monotonic practice effect creates a
+powerful confound between time-trending performance (upward) and
+time-trending emotions (downward, plausibly due to fatigue or
+habituation to the task). The model, lacking a time trend term,
+attributes this spurious covariation to β_E→P.
+
+In Study 2, by contrast, several features of the design would attenuate
+this confound. The varied content across sessions makes systematic
+practice-driven improvement less likely; the high stakes of the exam
+sustain motivation and emotional engagement over time, reducing the
+monotonic decline in affect seen in Study 1; and the temporal spacing of
+sessions over days and weeks — rather than minutes — disrupts the
+continuous accumulation of practice effects. Under these conditions, the
+time-trend confound is weaker, and the observed emotion–performance
+relationship may more closely reflect genuine affective processes.
+
+This interpretation generates a testable prediction: introducing a time
+trend into the Study 2 models should produce a smaller change in β_E→P
+than observed in Study 1. Unfortunately, we were unable to test this
+prediction directly, as the Study 2 data were collected by Breitwieser
+et al. (2022) and were not publicly available at the time of this
+analysis. We encourage future work to examine this hypothesis.
+
+
+## Limitations
+
+Several limitations should be noted. First, our model introduces the
+learning curve as population-level (fixed) log(trial) effects rather
+than allowing the time trend to vary across individuals. This choice was
+made to maintain parsimony and avoid overparameterization: in
+preliminary analyses, a random-slope specification for the log(trial)
+effects encountered convergence difficulties, likely due to the limited
+number of time points per individual (19 blocks) relative to the
+additional individual-level parameters required. The fixed-effect
+specification was sufficient to demonstrate the confound and represents
+a conservative test — if anything, allowing individual variation in the
+learning curve would likely absorb additional variance currently
+attributed to other parameters.
+
+Second, we acknowledge that exact LFO-CV, while providing an unbiased
+assessment of predictive performance, is computationally demanding.
+Bürkner et al. (2020) proposed an efficient PSIS approximation that
+avoids refitting the model at most prediction steps by using
+Pareto-smoothed importance sampling, with refitting only when the
+approximation quality degrades (Pareto k \> 0.7). However, their
+framework was developed for univariate time series models. In our case,
+the joint autoregressive structure across goals, performance, and
+emotions — combined with the hierarchical coupling of 357 participants
+through shared population parameters — means that each prediction step
+introduces a large block of informative observations (357 × 3 outcome
+variables). This renders the PSIS approximation infeasible, as the
+posterior shift at each step is too large for importance sampling to
+remain reliable. We therefore employed exact refitting at all 15
+prediction steps. While tractable for our application (approximately 8
+hours of computation per model), this approach would become prohibitive
+for models with substantially longer time series or more expensive
+individual fits. Developing efficient approximate LFO methods for
+complex hierarchical autoregressive models remains an important
+direction for future methodological work.
 
 ## Conclusion
+
+Our reanalysis supports the core theoretical framework proposed by Lin
+et al. (2024): goal setting, performance, and emotions are dynamically
+interrelated, with the goal–performance discrepancy playing a central
+role. However, the specific claim that positive emotions exert a
+negative causal influence on subsequent performance — interpreted via
+the coasting hypothesis — is not robust to the inclusion of a time trend
+controlling for practice effects. Rather than reflecting a genuine
+motivational process, this association appears to be an artifact of two
+independent temporal trends: improving performance and declining
+emotional engagement over the course of a repetitive task.
+
+This finding carries practical implications for the design and analysis
+of longitudinal self-regulation studies. Researchers employing
+repeated-measures paradigms in which both performance and affect are
+tracked over time should consider whether unmodeled time trends may
+generate spurious associations between these variables. A simple
+log(trial) covariate, as demonstrated here, can serve as a diagnostic
+tool to assess the robustness of observed effects.
+
+From a methodological standpoint, our work highlights the inadequacy of
+WAIC and LOO-CV for model comparison in autoregressive panel models and
+demonstrates that leave-future-out cross-validation, adapted for
+hierarchical structures, provides a more principled assessment. We
+encourage researchers working with longitudinal self-regulation models
+to adopt similar diagnostic and model comparison practices. \##
+Limitations and Future Directions
+
 
 # References
 
@@ -71,6 +258,5 @@ This is a reference [@cohen2003applied].
 :::
 
 # This Section Is an Appendix {#apx-a}
-
 
 # Another Appendix {#apx-b}
