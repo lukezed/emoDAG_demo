@@ -173,8 +173,42 @@ loo_compare(list(alt1 = loo_alt1, hyp = loo_hyp))
 # alt1   0.0       0.0
 # hyp  -77.5      33.6
 
+loo_model_weights(list(alt1 = loo_alt1, mine1 = loo_m1, hyp = loo_hyp))
+
+# Method: stacking
+# ------
+#   weight
+# hyp   0.177 
+# alt1  0.000 
+# mine1 0.823 
+
+loo_model_weights(list(alt1 = loo_alt1, hyp = loo_hyp))
+
+# Method: stacking
+# ------
+#   weight
+# alt1 0.701 
+# hyp  0.299 
+
+loo_model_weights(list(alt1 = loo_alt1, mine1 = loo_m1))
+
+# Method: stacking
+# ------
+#  weight
+# alt1  0.000 
+# mine1 1.000 
+
+loo_model_weights(list(mine1 = loo_m1, hyp = loo_hyp))
+
+# Method: stacking
+# ------
+#   weight
+# mine1 0.858 
+# hyp   0.142 
 
 # ---- Population-level estimates ----------------------------------------------
+
+
 
 pop_vars <- function(fit) {
   v <- fit$metadata()$stan_variables
