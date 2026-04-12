@@ -118,10 +118,11 @@
 
 
 
-\title{title}
+\title{Practice Effects Confound the Emotion--Performance Link in
+Self-Regulated Learning: A Reanalysis of Lin et al.~(2026)}
 
 
-\shorttitle{{[}RUNNING HEADER SHORT TITLE{]}}
+\shorttitle{PRACTICE EFFECTS CONFOUND EMOTION--PERFORMANCE}
 
 
 \usepackage{etoolbox}
@@ -145,9 +146,31 @@
 
 
 
-\abstract{1111 }
+\abstract{Lin et al.~(2026) proposed a computational model of the
+dynamic interplay between goal setting, performance, and emotions in
+self-regulated learning. In a repetitive math task (Study 1), they
+reported that positive emotions predicted lower subsequent performance,
+interpreting this via the coasting hypothesis. We argue that this
+finding may instead reflect a temporal confound: in a repetitive task,
+performance improves due to practice while emotional engagement
+declines, producing a spurious negative association when time trends are
+unmodeled. We reanalyze the Study 1 data by introducing a log(trial)
+learning curve into the best-fitting model. The negative
+emotion-to-performance effect is no longer credible in this extended
+model; instead, a strong practice effect emerges. This confound-based
+interpretation also parsimoniously accounts for why the
+emotion-to-performance pathway reversed direction in the original Study
+2, where task variety and high stakes attenuate practice-driven time
+trends. Methodologically, we show that the WAIC criterion used in the
+original study exhibits poor diagnostic reliability and is theoretically
+biased for autoregressive panel models. We implement exact
+leave-future-out cross-validation as an unbiased alternative, under
+which the original model selection conclusions are no longer
+supported. }
 
-\keywords{Keyword 1, Keyword 2, Keyword 3}
+\keywords{coasting hypothesis, computational modeling, leave-future-out
+cross-validation, model comparison, practice effects, self-regulated
+learning}
 
 \authornote{\par{\addORCIDlink{Chi Zhang}{0000-0002-9535-6186}} 
 \par{ }
@@ -465,7 +488,90 @@ Limitations and Future Directions
 
 \appendix
 
-\section{This Section Is an Appendix}\label{apx-a}
+\section{Model Specifications}\label{apx-a}
+
+This appendix provides the full mathematical specification of the three
+models compared in this study. All models share the same hierarchical
+Bayesian structure and differ only in the specification of the
+conditional means for goals, performance, and emotions. We first
+describe the common elements, then present the model-specific equations.
+
+\subsection{Common Structure}\label{common-structure}
+
+At each time point \(t\) (blocks 2 through 20), goals (\(G\)),
+performance (\(P\)), and emotions (\(E\)) are modeled as jointly
+normally distributed, conditional on the previous time point:
+
+\[
+G_{t+1} \sim \mathcal{N}(\mu^G_{t+1},\; \sigma_G), \quad
+P_{t+1} \sim \mathcal{N}(\mu^P_{t+1},\; \sigma_P), \quad
+E_{t+1} \sim \mathcal{N}(\mu^E_{t+1},\; \sigma_E)
+\tag{A1}
+\]
+
+where \(\sigma_G\), \(\sigma_P\), and \(\sigma_E\) are population-level
+residual standard deviations. Block 1 values serve as initial conditions
+and are not modeled. Each parameter \(\theta\) entering the conditional
+means below is specified hierarchically via a non-centered
+parameterization: \(\theta_i = \bar{\theta} + \sigma_\theta \cdot z_i\),
+where \(z_i \sim \mathcal{N}(0, 1)\),
+\(\bar{\theta} \sim \mathcal{N}(0, 3)\), and
+\(\sigma_\theta \sim \mathcal{N}^+(0, 3)\). Subscript \(i\) indexes
+participants.
+
+\subsection{Conditional Means}\label{conditional-means}
+
+The performance and emotion equations are shared across the Hypothesized
+and Alt1 models:
+
+\[
+\mu^P_{t+1} = \gamma^P_i + \alpha^P_i \, P_t + \beta^{GP \to P}_i \,(G_{t+1} - P_t) + \beta^{E \to P}_i \, E_t \tag{A2}
+\]
+
+\[
+\mu^E_{t+1} = \gamma^E_i + \alpha^E_i \, E_t + \beta^{GP \to E}_i \,(P_{t+1} - G_{t+1}) \tag{A3}
+\]
+
+The three models differ in the goal equation and in whether a log-trial
+trend is included, as described below.
+
+\textbf{Hypothesized Model.} The goal equation uses a single symmetric
+coefficient for the goal-performance discrepancy (GPD):
+
+\[
+\mu^G_{t+1} = \gamma^G_i + \alpha^G_i \, G_t + \beta^{GP \to G}_i \,(P_t - G_t) + \beta^{E \to G}_i \, E_t \tag{A4}
+\]
+
+\textbf{Alt1 Model.} The goal equation replaces the symmetric GPD term
+with separate coefficients for success and failure:
+
+\[
+\mu^G_{t+1} = \gamma^G_i + \alpha^G_i \, G_t + \beta^{E \to G}_i \, E_t +
+\begin{cases}
+\beta^{S}_i \,(P_t - G_t) & \text{if } P_t > G_t \text{ (success)} \\
+\beta^{F}_i \,(P_t - G_t) & \text{if } P_t \leq G_t \text{ (failure)}
+\end{cases}
+\tag{A5}
+\]
+
+\textbf{LogTrial Model.} This model extends Alt1 by adding
+population-level log-trial effects to all three conditional means. The
+goal equation is identical to Equation A5 with an additional term
+\(\beta^{\log t}_G \log(t+1)\). The performance and emotion equations
+become:
+
+\[
+\mu^P_{t+1} = \gamma^P_i + \alpha^P_i \, P_t + \beta^{GP \to P}_i \,(G_{t+1} - P_t) + \beta^{E \to P}_i \, E_t + \beta^{\log t}_P \log(t+1) \tag{A6}
+\]
+
+\[
+\mu^E_{t+1} = \gamma^E_i + \alpha^E_i \, E_t + \beta^{GP \to E}_i \,(P_{t+1} - G_{t+1}) + \beta^{\log t}_E \log(t+1) \tag{A7}
+\]
+
+The three log-trial coefficients (\(\beta^{\log t}_G\),
+\(\beta^{\log t}_P\), \(\beta^{\log t}_E\)) are population-level only,
+with no individual-level variation. This choice was made to maintain
+parsimony; see Limitations for discussion.
 
 \section{Another Appendix}\label{apx-b}
 
