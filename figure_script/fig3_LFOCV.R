@@ -42,11 +42,11 @@ fig3 <- ggplot(delta_df, aes(x = block, y = delta)) +
 
 
 ggsave("figure/fig3_lfo_delta.pdf", fig3, 
-       width = 6.5, height = 6.0, units = "in", 
+       width = 5, height = 6.0, units = "in", 
        device = cairo_pdf)
 
 
 ggsave("figure/fig3_lfo_delta.png", fig3, 
-       width = 6.5, height = 6.0, units = "in", 
+       width = 5, height = 6.0, units = "in", 
        dpi = 600, 
        device = ragg::agg_png)

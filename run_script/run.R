@@ -107,8 +107,8 @@ fit_m1$cmdstan_diagnose()
 # ---- WAIC comparison ----------------------------------------------------------
 
 # Original paper used WAIC for model comparison:
-#   Hypothesized: 53,484.4    (our hyp)
-#   Alternate 1:  52,743.25   (original; ours: 53,326.1 — within SE)
+#   Hypothesized: 52,934.7   (original; our: 53,484.4 - within SE)
+#   Alternate 1:  52,743.3  (original; ours: 53,326.1 — within SE)
 #
 # All three models show >16% p_waic > 0.4 warnings → WAIC unreliable.
 
