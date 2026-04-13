@@ -5,3 +5,11 @@
 .DS_Store
 .quarto
 **/*.rds
+data/data.csv
+models/*.rds
+stan/*_optimized
+stan/mine1_logtrial
+paper/_freeze/
+paper/_extensions/
+paper/paper.tex
+paper/paper_files/
