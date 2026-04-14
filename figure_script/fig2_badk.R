@@ -61,5 +61,12 @@ ggsave("figure/fig2_pareto_k.pdf", fig2,
 
 ggsave("figure/fig2_pareto_k.png", fig2, 
        width = 6.5, height = 6.0, units = "in", 
-       dpi = 600, 
+       dpi = 300, 
        device = ragg::agg_png)
+
+ggsave("figure/fig2_pareto_k.tiff", fig2, 
+       width = 6.5, height = 6.0, units = "in", 
+       dpi = 300, 
+       device = ragg::agg_tiff,
+       compression = "lzw")
+

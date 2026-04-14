@@ -1,6 +1,6 @@
 # emoDAG_demo
 
-Reanalysis of Lin et al. (2026), "The Dynamic Interplay Between Goal Setting, Performance, and Emotions in Self-Regulated Learning" (*Journal of Educational Psychology*). See https://osf.io/preprints/psyarxiv/weu9m_v1 for the full paper.
+Reanalysis of Lin et al. (2026), "The Dynamic Interplay Between Goal Setting, Performance, and Emotions in Self-Regulated Learning" (*Journal of Educational Psychology*). 
 
 ## What this project does
 

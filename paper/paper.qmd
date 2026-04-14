@@ -1,0 +1,897 @@
+---
+title: "Practice Effects Confound the Emotion–Performance Link in Self-Regulated Learning: A Reanalysis of Lin et al. (2026)"
+shorttitle: "PRACTICE EFFECTS CONFOUND EMOTION–PERFORMANCE"
+author:
+  - name: Chi Zhang
+    corresponding: true
+    orcid: 0000-0002-9535-6186
+    email: chi.zhang-3@manchester.ac.uk
+    affiliations:
+      - name: The University of Manchester
+        department: Manchester Institute of Education
+        address: Oxford Road
+        city: Manchester
+        region: England
+        country: UK
+        postal-code: M13 9PL
+author-note:
+  status-changes: 
+    affiliation-change: null
+    deceased: null
+  disclosures:
+    study-registration: null
+    data-sharing: null
+    related-report: null
+    conflict-of-interest: "The author states that there is no conflict of interest."
+    financial-support: null
+    gratitude: "The author would like to acknowledge the assistance given by Research IT, and the use of The HPC Pool funded by the Research Lifecycle Programme at The University of Manchester."
+    authorship-agreements: null
+abstract: |
+  Lin et al. (*Journal of Educational Psychology*, 2026) proposed a computational model of the dynamic interplay between goal setting, performance, and emotions in self-regulated learning. In a repetitive math task (Study 1), they reported that positive emotions predicted lower subsequent performance, interpreting this via the coasting hypothesis. We argue that this finding may instead reflect a temporal confound: in a repetitive task, performance improves due to practice while emotional engagement declines, producing a spurious negative association when time trends are unmodeled. We reanalyze the Study 1 data by introducing a log(trial) learning curve into the best-fitting model. The negative emotion-to-performance effect is no longer credible in this extended model; instead, a strong practice effect emerges. This confound-based interpretation also parsimoniously accounts for why the emotion-to-performance pathway reversed direction in the original Study 2, where task variety and high stakes attenuate practice-driven time trends. Methodologically, we show that the WAIC criterion used in the original study exhibits poor diagnostic reliability and is theoretically biased for autoregressive panel models. We implement exact leave-future-out cross-validation as an unbiased alternative, under which the original model selection conclusions are no longer supported.
+keywords: [coasting hypothesis, computational modeling, leave-future-out cross-validation, model comparison, practice effects, self-regulated learning]
+bibliography: reference.bib
+format:
+  apaquarto-docx: default
+  apaquarto-html: default
+  apaquarto-pdf:
+    include-in-header:
+      text: |
+        \usepackage{caption}
+        \captionsetup[table]{skip=20pt}
+    documentmode: man
+    floatsintext: true
+    pdf-engine: xelatex
+    keep-tex: true
+    mainfont: "Times New Roman"
+    tbl-cap-location: top
+editor: 
+  markdown: 
+    wrap: 72
+
+header-includes:
+  - \makeatletter
+  - \@ifundefined{cslhangindent}{\newlength{\cslhangindent}}{}
+  - \makeatother
+---
+
+Self-regulated learning (SRL) describes the process by which learners
+actively monitor and adjust their goals, strategies, and effort in
+pursuit of academic outcomes [@panadero2017review; @zimmerman2000attain;
+@pintrich2000role]. A central tenet of SRL frameworks is that learners
+set goals, evaluate their performance against those goals, and revise
+their behavior accordingly. Within this cycle, emotions have been
+increasingly recognized as playing a key role: how students feel about
+their progress influences how they set subsequent goals and how
+effectively they perform [@pekrun2006contro; @ben-eliyahu2019academ;
+@efklides2011intera; @efklides2024revisi].
+
+A natural expectation, grounded in several theoretical traditions, is
+that positive emotions should facilitate cognitive performance.
+Control-value theory posits that positive activating emotions such as
+enjoyment enhance attention, motivation, and the use of flexible
+learning strategies, thereby supporting achievement [@pekrun2006contro;
+@pekrun2002academ; @forsblom2022cognit]. Similarly, the
+broaden-and-build theory suggests that positive affect broadens the
+scope of cognition and builds intellectual resources
+[@fredrickson2001role]. Empirical evidence from both laboratory and
+educational settings has largely supported this positive link [e.g.,
+@berweger2025daily; @pekrun2017achiev; @forsblom2022cognit]. However,
+some studies have reported null or context-dependent effects. For
+example, in a high-stakes examination context, high positive affect did
+not reliably predict better achievement once controls were introduced
+[@jerrim2022power]. Moreover, certain positive emotions may reduce
+subsequent effortful engagement: in daily academic goal striving, pride
+was associated with lower next-day effort [@seo2021feelin]. Experimental
+evidence also suggests that positive mood can impair working-memory
+performance under certain conditions [@martin2011influe].
+
+Recently, Lin et al. [-@lin2026dynami] proposed a computational model of
+the dynamic interplay between goal setting, performance, and emotions in
+SRL. They applied their model to two empirical datasets: a controlled
+online math task in which participants solved three-digit arithmetic
+problems across 20 two-minute blocks (Study 1), and a naturalistic
+learning context in which German medical students studied for a
+high-stakes state exam over a period of up to 40 days (Study 2). In
+Study 2, the model confirmed the expected positive association: stronger
+positive emotions predicted higher subsequent performance. In Study 1,
+however, the model estimated a negative emotion-to-performance link,
+suggesting that positive emotions led to worse subsequent performance.
+The authors interpreted this counterintuitive finding through the lens
+of the coasting hypothesis [@thurmer2020mechan; @carver2003pleasu],
+which proposes that positive emotions signal that sufficient progress
+has been made toward one's goals, leading individuals to reduce effort
+and consequently perform worse. While this interpretation is
+theoretically coherent, the reversal of the effect across the two
+studies was not given a unified explanation.
+
+In this paper, however, we propose that the negative
+emotion-to-performance association observed in Study 1 may reflect a
+temporal confound rather than a genuine causal process. There are at
+least two reasons to suspect that unmodeled time trends could generate
+such a confound in Lin et al.'s [-@lin2026dynami] work. First, practice
+effects are well documented in repetitive cognitive tasks: repeated
+exposure to the same type of problem can increase fluency and improve
+performance over time [@newell2013mechan; @tenison2016phases;
+@scharfen2018retest]. Second, affective responses are also
+time-sensitive. Repeated stimulation can attenuate responsiveness
+through habituation [@rankin2009habitu; @thompson1966habitu], while
+sustained engagement in a monotonous task may alter emotional experience
+through boredom and fatigue [e.g., @tanaka2014withina]. Recent intensive
+longitudinal evidence further suggests that emotional states differ in
+their temporal dynamics rather than following a single uniform pattern
+[@berweger2025daily]. As the task progresses, multiple temporally driven
+processes may therefore operate simultaneously: performance may improve
+due to practice, while affective states may change over time because of
+habituation, boredom, and fatigue. If these trends are not accounted for
+in the model, the resulting covariance between rising performance and
+shifting emotions may be misattributed to a direct causal pathway from
+emotions to performance, producing a spurious negative coefficient.
+
+A second concern relates to the model comparison procedure used to
+evaluate competing specifications. A key finding of the original study
+was that Alternative 1, a model that distinguishes between the effects
+of goal success and goal failure on subsequent goal revision,
+outperformed the Hypothesized model (which treats the goal-performance
+discrepancy symmetrically) on the basis of WAIC. This comparison led the
+authors to conclude that piecewise modeling of the discrepancy is
+warranted. However, the article reported only raw WAIC values without
+standard errors or diagnostic indicators, making it impossible for
+readers to assess whether the observed difference was statistically
+meaningful. In the present study, we supplement the original comparison
+with two additional evaluation criteria. The first is PSIS-LOO
+cross-validation[^1] [@vehtari2017practia], which improves on WAIC in
+several respects: (i) it is asymptotically equivalent to WAIC under
+regular conditions, while often being more robust in finite samples;
+(ii) it provides Pareto $\hat{k}$ diagnostics to flag unreliable
+estimates [@vehtari2015paretoa]; and (iii) it supports stacking weights
+for quantifying relative model contributions [@yao2018usinga]. However,
+both WAIC and PSIS-LOO are biased for models with autoregressive
+structure, because leaving out a single observation still allows future
+time points to inform predictions of the past, leaking temporal
+information into the estimate. This leakage can systematically favor
+more highly parameterized models, because their additional flexibility
+gives them more opportunity to absorb temporally leaked information and
+thereby appear superior in model comparison. Our second criterion, exact
+leave-future-out cross-validation [LFO-CV, @burkner2020approx],
+addresses this by using only past observations to predict future ones.
+This aligns model evaluation with the forecasting task of interest and
+avoids the optimistic bias induced by temporal leakage.
+
+[^1]: Pareto-smoothed importance sampling leave-one-out cross
+    validation, PSIS-LOO-CV.
+
+In the following, we will then (1) replicate the original model fits for
+the Hypothesized and Alt1 models and extend Alt1 by introducing
+population-level log(trial) effects on goals, performance, and emotions,
+testing whether the negative emotion-to-performance effect is robust to
+the inclusion of a learning curve;[^2] (2) evaluate model comparison
+across three criteria of increasing rigor (WAIC, PSIS-LOO, and exact
+LFO-CV); and (3) offer an alternative interpretation of the
+contradictory emotion-to-performance findings across Studies 1 and 2,
+grounded in the temporal confound identified above.
+
+[^2]: All data and analysis scripts are publicly available at
+    https://osf.io/dw95s. We optimized the Stan implementation of the
+    original models but the mathematical specifications are equivalent;
+    see Appendix A.
+
+# Method
+
+## Data and Task
+
+We reanalyzed the publicly available Study 1 data from Lin et al.
+[-@lin2026dynami]. A total of 357 participants
+($n_{\mathrm{female}} = 212$, $M_{\mathrm{age}} = 38.83$,
+$SD = 12.40$) completed an online math task consisting of 20 two-minute
+blocks of three-digit arithmetic problems within a single session (see
+@fig-task). At the start of each block, participants set a numerical
+goal; after each block, they received performance feedback and rated
+their emotional state. The openly available dataset contains three
+variables per participant per block: goal level (number of questions
+intended), performance (number of correct answers), and an aggregated
+emotion index ranging from approximately $-3$ to $3$ in increments of
+$1/3$, where positive values indicate positive affect. The discrete
+emotion ratings from which this index was derived are not available in
+the open data. Following Lin et al. [-@lin2026dynami], we therefore
+treated this aggregated index as approximately continuous. Full details
+of the task design, incentive structure, and emotion aggregation
+procedure are provided in Lin et al. [-@lin2026dynami].
+
+![Study 1 Experimental design. *Note.* Adapted from "The Dynamic Interplay Between Goal Setting, Performance, and Emotions in Self-Regulated Learning: A Computational Modeling Approach," by W. M. Lin, L. FitzGibbon, M. Theobald, J. Breitwieser, G. Brod, K. Murayama, and M. Sakaki, 2026, *Journal of Educational Psychology*. Participants first set a goal (G), then completed arithmetic problems within a 2-minute block with trial-level feedback. After each block, they received block-level performance feedback (P) and rated their emotions (E). This sequence was repeated across 20 blocks.](../figure/fig1_lin(2026).jpg){#fig-task width="90%"}
+
+## Computational Models
+
+All three models share the same general structure: at each time point,
+goals ($G$), performance ($P$), and emotions ($E$) are modeled as
+jointly normally distributed, conditional on values at the previous time
+point and on cross-lagged predictors. Block 1 served as the initial
+condition and was not itself modeled. Full mathematical specifications
+are provided in Appendix A; here we describe the substantive
+interpretation of each model.
+
+### Hypothesized Model
+
+This model follows the original specification of Lin et al.
+[-@lin2026dynami] and embodies a symmetric self-regulation process. At
+each time step, goal revision is driven by three forces: (i) an
+autoregressive tendency, (ii) the goal-performance discrepancy (GPD; the
+difference between what the participant achieved and what they aimed
+for), and (iii) the participant's emotional state. Crucially, the GPD
+enters the goal equation with a single coefficient, meaning that
+exceeding one's goal by two questions has the same magnitude of effect
+on subsequent goal revision as falling short by two questions. Performance
+at each time step is predicted by previous performance, the discrepancy
+between the newly set goal and previous performance, and previous
+emotional state. Emotions are predicted by their own autoregressive
+component and by the GPD computed after current performance is observed.
+
+### Alt1 Model
+
+Alt1 modifies only the goal equation. The single symmetric GPD
+coefficient is replaced by two separate coefficients: one governing the
+effect of goal success (when performance exceeds the goal) and one
+governing the effect of goal failure (when performance falls short). All
+other equations remain identical to the Hypothesized model. This was the
+best-fitting model reported by Lin et al. [-@lin2026dynami], and its
+superiority over the Hypothesized model on the basis of WAIC was taken
+as evidence that success and failure exert asymmetric effects on goal
+revision.
+
+### LogTrial Model
+
+The LogTrial model (LogT in tables) extends Alt1 by adding three
+population-level log(trial) learning-curve terms, one to each of the
+goal, performance, and emotion equations. These terms allow each outcome
+to absorb a parsimonious nonlinear learning-curve or time-trend
+component over the 20 blocks, such as practice-related improvement in
+performance, gradual goal adjustment, or broad affective shifts over
+time. Aside from these three additional fixed effects, the model is
+identical to Alt1. The log(trial) coefficients were specified at the
+population level only, without individual-level variation, as a
+parsimonious first-order correction for broad across-trial trends. This
+choice also avoided the convergence problems we encountered when
+allowing these trends to vary by participant.
+
+### Estimation
+
+Parameters were estimated in a hierarchical framework using weakly
+informative $\mathcal{N}(0, 3)$ priors. For the Hypothesized and Alt1
+models, prior specifications and parameter structure were matched to Lin
+et al. [-@lin2026dynami]. Our Stan implementation differed only in
+computational details, most notably the use of a non-centered
+parameterization to improve sampling efficiency; the underlying
+mathematical model was equivalent, and the recovered parameter estimates
+closely reproduced the original results.
+
+All models were fit in `Stan` via the `CmdStanR` interface
+[@gabry2025cmdsta], with four chains of 1,000 warmup and 1,000 sampling
+iterations each (4,000 posterior draws total), `adapt_delta = 0.95`,
+and `max_treedepth = 15`. All models converged without divergences, no
+transitions hit the maximum treedepth, all $\hat{R}$ values were below
+1.01, and bulk and tail effective sample sizes were adequate for all
+monitored parameters.[^3]
+
+[^3]: The original study specified 10,000 iterations per chain with
+    `adapt_delta = 0.99` and `max_treedepth = 20`. These settings are
+    considerably more conservative than necessary for the present
+    implementation; our reduced settings were sufficient to produce
+    stable posterior estimates that closely recovered the original
+    parameter values for the Hypothesized and Alt1 models (see Results).
+
+## Model Comparison
+
+As outlined in the Introduction, we evaluated model fit using three
+criteria of increasing suitability for autoregressive structures.
+
+**WAIC.** We computed the widely applicable information criterion
+[@watanabe2010asympt] from the pointwise log-likelihood using the `loo`
+R package [@vehtari2017practia]. Following Vehtari et al.
+[-@vehtari2017practia], we examined the proportion of observations with
+estimated effective numbers of parameters
+($\hat{p}_{\mathrm{WAIC}}$) exceeding 0.4, which signals that the WAIC
+estimate for that observation may be unreliable.
+
+**PSIS-LOO.** We computed Pareto-smoothed importance sampling
+leave-one-out cross-validation [@vehtari2017practia;
+@vehtari2015paretoa] from the same pointwise log-likelihood draws.
+Pareto $\hat{k}$ diagnostics were used to assess the reliability of
+each pointwise estimate: observations with $\hat{k} > 0.7$ indicate
+that the importance-sampling approximation may be unreliable. When only
+a small number of observations are flagged, remedies are available,
+including moment matching [@paananen2021implic] and refitting the model
+with the problematic observations excluded. However, when the number of
+problematic observations is large, Vehtari et al. [-@vehtari2017practia]
+recommend more robust alternatives. As reported in the Results, all
+three models exhibited a large number of problematic Pareto $\hat{k}$
+values. This makes standard PSIS-LOO unreliable in the present
+application. Although $K$-fold cross-validation is often recommended in
+such cases, it would not solve the temporal leakage problem in the
+present autoregressive setting. We therefore used exact LFO-CV as our
+primary time-respecting evaluation criterion. We also computed stacking
+weights [@yao2018usinga] to quantify each model's relative predictive
+contribution under PSIS-LOO.
+
+**LFO-CV.** We implemented exact one-step-ahead leave-future-out
+cross-validation [@burkner2020approx], adapted for our panel data
+structure. Starting from an initial history of $L = 5$ blocks (blocks
+1 through 5, with block 1 treated as the initial condition and blocks
+2 through 5 as modeled observations), we iteratively fit each model
+using data up to block $t$ and evaluated one-step-ahead predictive
+performance for block $t + 1$ for all 357 participants simultaneously,
+yielding 15 one-step-ahead predictive evaluations (blocks 6 through 20).
+At each step, the model was refit from scratch using the same MCMC
+settings as in the full-sample analysis. For each evaluation, we
+computed the per-block expected log predictive density (ELPD) by
+averaging the exponentiated log-likelihood across posterior draws for
+each participant and then summing the log of these averages across all
+$N = 357$ participants. The total LFO-CV score is the sum of per-block
+ELPDs across the 15 prediction steps. For pairwise model comparison, we
+computed $\Delta \mathrm{ELPD}$ as the difference in total LFO-CV
+scores. We also report an approximate standard error based on the
+variability of the 15 blockwise predictive differences, interpreted
+cautiously given the small number of forecasting steps.
+
+## Transparency and Openness
+
+The data used in this reanalysis are publicly available from the
+original OSF repository for Lin et al. [-@lin2026dynami]
+(https://osf.io/qc6hm/). The public dataset does not include the raw
+emotion item responses used to derive the aggregated emotion index
+analyzed here. All code for data preparation, model estimation,
+cross-validation, figure generation, and manuscript preparation has been
+made publicly available at https://osf.io/dw95s. Analyses were
+conducted in R 4.4.1 via `cmdstanr`, `loo`, and packages from the
+`tidyverse`, with full session information archived in the online
+repository. This study was not preregistered.
+
+
+# Results
+
+## Replication and Predictive Diagnostic Concerns
+
+Our reimplementation closely reproduced the original WAIC-based
+comparison. For the Hypothesized and Alt1 models, our WAIC values were
+within the expected range of those reported by Lin et al.
+[-@lin2026dynami] (@tbl-waic-loo, A). As in the original paper, Alt1
+obtained a lower WAIC than the Hypothesized model, and adding log(trial)
+effects further improved WAIC for the LogTrial model.
+
+However, these WAIC comparisons were not reliable. All three models
+showed a substantial proportion of observations with
+$\hat{p}_{\mathrm{WAIC}} > 0.4$ (16.7%--17.4%; @tbl-waic-loo, A),
+indicating unstable pointwise WAIC contributions for a nontrivial share
+of the data. This alone weakens the original WAIC-based model-selection
+argument, especially because Lin et al. did not report further
+predictive diagnostics. We therefore extended the original analysis by
+examining PSIS-LOO as an additional check. As shown in @fig-badk and
+@tbl-waic-loo (B), all three models produced numerous large Pareto
+$\hat{k}$ values, with 89--113 observations exceeding 0.7 and 19--25
+exceeding 1.0. These results show that the standard approximate criteria
+were diagnostically problematic in this setting. For this reason, and
+because the data are temporally ordered, we treat exact LFO-CV as the
+primary basis for model comparison.
+
+::: {#tbl-waic-loo}
+```{r}
+#| echo: false
+#| results: asis
+
+library(knitr)
+library(kableExtra)
+
+tab_waic <- data.frame(
+  Model = c("Hyp", "Alt1", "LogT"),
+  `WAIC in Lin et al. (2026)` = c("52,934.7", "52,743.3", "—"),
+  `WAIC (SE)` = c(
+    "53,484.4 (1,149.8)",
+    "53,326.1 (1,176.6)",
+    "53,095.0 (1,156.6)"
+  ),
+  `$\\hat{p}_{\\mathrm{WAIC}} > 0.4$ (\\%)` = c(
+    "16.7\\%", "17.2\\%", "17.4\\%"
+  ),
+  check.names = FALSE
+)
+
+tab_loo <- data.frame(
+  Model = c("Hyp", "Alt1", "LogT"),
+  `$\\Delta \\mathrm{ELPD}_{\\mathrm{LOO}}$ (SE)` = c(
+    "-177.2 (33.8)",
+    "-99.8 (12.4)",
+    "0.0 (0.0)"
+  ),
+  `$\\hat{k} > 0.7$ n (\\%)` = c(
+    "89 (1.3\\%)",
+    "111 (1.6\\%)",
+    "113 (1.7\\%)"
+  ),
+  `$\\hat{k} > 1.0$ n (\\%)` = c(
+    "25 (0.4\\%)",
+    "19 (0.3\\%)",
+    "25 (0.4\\%)"
+  ),
+  `Stacking weight (\\%)` = c("17.7\\%", "0.0\\%", "82.3\\%"),
+  check.names = FALSE
+)
+
+tab_pairwise <- data.frame(
+  Comparison = c("LogT $-$ Hyp", "LogT $-$ Alt1", "Alt1 $-$ Hyp"),
+  `$\\Delta \\mathrm{ELPD}_{\\mathrm{WAIC}}$ (SE)` = c(
+    "194.7 (33.0)",
+    "115.5 (15.4)",
+    "79.7 (34.0)"
+  ),
+  `$\\Delta \\mathrm{ELPD}_{\\mathrm{LOO}}$ (SE)` = c(
+    "177.2 (33.8)",
+    "99.8 (12.4)",
+    "77.5 (33.6)"
+  ),
+  `$\\Delta \\mathrm{ELPD}_{\\mathrm{LFO}}$ (SE)` = c(
+    "78.12 (28.92)",
+    "39.54 (19.20)",
+    "38.57 (33.80)"
+  ),
+  `First-model $w_{\\mathrm{stack}}$ (\\%)` = c(
+    "85.8\\%",
+    "100.0\\%",
+    "70.1\\%"
+  ),
+  check.names = FALSE
+)
+
+t1 <- kbl(
+  tab_waic,
+  format = "latex",
+  booktabs = TRUE,
+  escape = FALSE,
+  align = c("l", "c", "c", "c"),
+  linesep = ""
+) |>
+  add_header_above(c(" " = 1, "A. WAIC comparison" = 3), bold = TRUE) |>
+  column_spec(1, width = "1.8cm") |>
+  column_spec(2, width = "3.7cm") |>
+  column_spec(3, width = "3.5cm") |>
+  column_spec(4, width = "2.8cm") |>
+  kable_styling(
+    font_size = 9.5,
+    full_width = FALSE,
+    position = "left"
+  )
+
+t2 <- kbl(
+  tab_loo,
+  format = "latex",
+  booktabs = TRUE,
+  escape = FALSE,
+  align = c("l", "c", "c", "c", "c"),
+  linesep = ""
+) |>
+  add_header_above(c(" " = 1, "B. PSIS-LOO diagnostics" = 4), bold = TRUE) |>
+  column_spec(1, width = "1.8cm") |>
+  column_spec(2, width = "3.0cm") |>
+  column_spec(3, width = "2.6cm") |>
+  column_spec(4, width = "2.6cm") |>
+  column_spec(5, width = "3cm") |>
+  kable_styling(
+    font_size = 9.5,
+    full_width = FALSE,
+    position = "left"
+  )
+
+t3 <- kbl(
+  tab_pairwise,
+  format = "latex",
+  booktabs = TRUE,
+  escape = FALSE,
+  align = c("l", "c", "c", "c", "c"),
+  linesep = ""
+) |>
+  add_header_above(c(" " = 1, "C. Pairwise comparisons across different criteria" = 4), bold = TRUE) |>
+  column_spec(1, width = "2.2cm") |>
+  column_spec(2, width = "2.8cm") |>
+  column_spec(3, width = "2.8cm") |>
+  column_spec(4, width = "2.8cm") |>
+  column_spec(5, width = "3.2cm") |>
+  kable_styling(
+    font_size = 9.5,
+    full_width = FALSE,
+    position = "left"
+  )
+
+latex_out <- paste0(
+  "```{=latex}\n",
+  "\\noindent\n",                
+  "\\begin{minipage}{\\linewidth}\n",
+  "\\raggedright\n",            
+  as.character(t1), "\n\n",
+  "\\vspace{0.5em}\n\n",
+  as.character(t2), "\n\n",
+  "\\vspace{0.5em}\n\n",
+  as.character(t3), "\n",
+  "\\end{minipage}\n",
+  "```\n"
+)
+
+knitr::asis_output(latex_out)
+```
+
+Model comparison results for the three candidate models. In A, lower
+WAIC values indicate better fit. In B,
+$\Delta \mathrm{ELPD}_{\mathrm{LOO}}$ values are reported relative to
+the best-performing model, LogT, which is set to 0; higher Pareto
+$\hat{k}$ counts indicate less stable PSIS-LOO approximations; stacking
+weights are from the three-model comparison. In C, pairwise differences
+are reported so that positive values favor the first-named model;
+pairwise stacking weights are from the corresponding two-model
+comparisons and are reported for the first-named model.
+:::
+
+![Pareto $\hat{k}$ Diagnostic Values From PSIS-LOO Cross-Validation for
+the Hypothesized (a), Alt1 (b), and LogTrial (c) Models. Each point
+represents one of 6,783 observations. Dashed and solid horizontal lines
+mark the $\hat{k}$ = 0.7 and $\hat{k}$ = 1.0 thresholds, respectively.
+Yellow points ($\hat{k}$ > 0.7) indicate potentially unreliable
+importance sampling estimates; red points ($\hat{k}$ > 1.0) indicate
+that a finite mean of the importance weights does not exist. All three
+models exhibit problematic $\hat{k}$ values well in excess of what can
+be remedied through moment matching or pointwise
+refitting.](../figure/fig2_pareto_k.pdf){#fig-badk width="80%"}
+
+## Model Comparison Across Criteria
+
+@tbl-waic-loo (C) presents pairwise comparisons under WAIC, PSIS-LOO,
+and exact LFO-CV. The clearest result is that the LogTrial model
+outperformed both the Hypothesized and Alt1 models under all three
+criteria. Under exact LFO-CV, LogTrial remained clearly better than the
+Hypothesized model ($\Delta \mathrm{ELPD} = 78.12$, SE = 28.92).
+Relative to Alt1, its advantage was smaller but still significant
+($\Delta \mathrm{ELPD} = 39.54$, SE = 19.20).
+
+The more consequential comparison is Alt1 versus the Hypothesized model,
+because this was the contrast on which the original model-selection
+conclusion depended. Under WAIC and PSIS-LOO, Alt1 outperformed the
+Hypothesized model ($\Delta \mathrm{ELPD} = 79.7$ and 77.5,
+respectively). Under exact LFO-CV, however, this difference was reduced
+to $\Delta \mathrm{ELPD} = 38.57$ with SE = 33.80. Alt1 therefore
+remained directionally preferred, but its predictive advantage was small
+relative to its uncertainty once the comparison was made with a
+temporally appropriate criterion. The original conclusion that Alt1
+should be selected over the Hypothesized model was thus not strongly
+supported.
+
+The stacking weights tell the same story. In the three-model PSIS-LOO
+comparison, Alt1 received zero weight, whereas LogTrial received 82.3%
+and the Hypothesized model 17.7% (@tbl-waic-loo, B). In the pairwise
+comparison with the Hypothesized model, Alt1 received 70.1% of the
+stacking weight (@tbl-waic-loo, C). Thus, Alt1 is more likely than the
+Hypothesized model to be the better predictive specification, but the
+advantage is limited, and it disappears as a serious competitor once
+the LogTrial model is included.
+
+## LFO Per-Block Comparisons
+
+@fig-lfo shows the per-block $\Delta \mathrm{ELPD}$ values from exact
+LFO-CV. The LogTrial model outperformed the Hypothesized model in 13 of
+the 15 prediction steps. Relative to Alt1, LogTrial performed better in
+12 blocks, tied in 1, and performed worse in 2, yielding a smaller but
+still positive aggregate advantage.
+
+The Alt1 versus Hypothesized comparison was weaker. Alt1 performed
+better in 11 blocks, tied in 1, and performed worse in 3, but much of
+its cumulative advantage was offset by the Hypothesized model's
+especially strong performance in block 10. The blockwise pattern is
+therefore consistent with the aggregate LFO-CV result: Alt1 tended to
+perform better, but not by a margin that was clearly separated from its
+uncertainty.
+
+![Per-Block Pairwise Differences in Expected Log Predictive Density From
+Exact Leave-Future-Out Cross-Validation (Blocks 6--20). Each bar
+represents the $\Delta$ELPD at a single one-step-ahead prediction step.
+Blue bars indicate that the first-named model predicted better at that
+block; red bars indicate the reverse. Annotation text reports the total
+$\Delta$ELPD summed across all 15 blocks and its ratio to the standard
+error.](../figure/fig3_lfo_delta.pdf){#fig-lfo width="70%"}
+
+## Parameter Estimates
+
+@tbl-model-comparison presents the population-level parameter estimates
+across the three models, and @fig-forest shows the corresponding
+standardized posterior distributions. The key change appears in the
+emotion-to-performance pathway, $\beta^{E \to P}$. In both the
+Hypothesized and Alt1 models, this parameter was credibly negative
+(Hypothesized: $-0.102$, 95% CrI \[$-0.171$, $-0.037$\]; Alt1: $-0.104$,
+95% CrI \[$-0.174$, $-0.036$\]), replicating the result reported by Lin
+et al. [-@lin2026dynami]. In the LogTrial model, however, the estimate
+was substantially attenuated and was no longer credibly different from
+zero ($-0.043$, 95% CrI \[$-0.114$, $0.028$\]).
+
+::: {#tbl-model-comparison}
+```{r}
+#| echo: false
+#| output: asis
+
+library(knitr)
+library(kableExtra)
+
+tab <- data.frame(
+  Parameter = c(
+    "$\\alpha^G$",
+    "$\\alpha^P$",
+    "$\\alpha^E$",
+    "$\\beta^{GP \\to G}$",
+    "$\\beta^{GP \\to G\\mid S}$",
+    "$\\beta^{GP \\to G\\mid F}$",
+    "$\\beta^{GP \\to P}$",
+    "$\\beta^{GP \\to E}$",
+    "$\\beta^{E \\to G}$",
+    "$\\beta^{E \\to P}$",
+    "$\\beta^{\\log t}_G$",
+    "$\\beta^{\\log t}_P$",
+    "$\\beta^{\\log t}_E$"
+  ),
+  `Model Hyp` = c(
+    "0.858 [0.838, 0.877]",
+    "0.596 [0.554, 0.637]",
+    "0.515 [0.481, 0.548]",
+    "0.322 [0.299, 0.346]",
+    "-",
+    "-",
+    "0.428 [0.382, 0.474]",
+    "0.128 [0.111, 0.145]",
+    "0.078 [0.049, 0.107]",
+    "-0.102 [-0.171, -0.037]",
+    "-",
+    "-",
+    "-"
+  ),
+  `Model Alt1` = c(
+    "0.869 [0.850, 0.888]",
+    "0.596 [0.555, 0.636]",
+    "0.515 [0.479, 0.549]",
+    "-",
+    "0.273 [0.250, 0.296]",
+    "0.483 [0.427, 0.541]",
+    "0.428 [0.383, 0.475]",
+    "0.129 [0.112, 0.145]",
+    "0.067 [0.038, 0.098]",
+    "-0.104 [-0.174, -0.036]",
+    "-",
+    "-",
+    "-"
+  ),
+  `Model LogT` = c(
+    "0.877 [0.857, 0.896]",
+    "0.500 [0.456, 0.544]",
+    "0.513 [0.478, 0.548]",
+    "-",
+    "0.273 [0.249, 0.296]",
+    "0.491 [0.434, 0.549]",
+    "0.369 [0.322, 0.418]",
+    "0.128 [0.112, 0.145]",
+    "0.060 [0.031, 0.091]",
+    "-0.043 [-0.114, 0.028]",
+    "-0.047 [-0.083, -0.011]",
+    "0.326 [0.262, 0.393]",
+    "-0.017 [-0.037, 0.002]"
+  ),
+  check.names = FALSE
+)
+
+kbl(
+  tab,
+  format = "latex",
+  booktabs = TRUE,
+  escape = FALSE,
+  align = c("l", "c", "c", "c"),
+  linesep = "",
+  col.names = c("Parameter", "Model Hyp", "Model Alt1", "Model LogT")
+) |>
+  add_header_above(c(" " = 1, "Estimate [95% CrI]" = 3)) |>
+  pack_rows("Autoregression effects", 1, 3, bold = TRUE) |>
+  pack_rows("GPD effects", 4, 8, bold = TRUE) |>
+  pack_rows("Emotion effects", 9, 10, bold = TRUE) |>
+  pack_rows("log(t) effects", 11, 13, bold = TRUE) |>
+  column_spec(1, width = "2.5cm") |>
+  column_spec(2, width = "4cm") |>
+  column_spec(3, width = "4cm") |>
+  column_spec(4, width = "4cm") |>
+  kable_styling(
+    latex_options = c("hold_position"),
+    font_size = 9.5,
+    full_width = FALSE,
+    position = "center"
+  )
+```
+
+Posterior means with 95% credible intervals for population-level
+parameters across the three models. The Hypothesized model assumes a
+symmetric GPD effect on goals, whereas Alt1 and LogT estimate separate
+asymmetric effects conditional on success and failure.
+:::
+
+At the same time, a strong positive log(trial) effect on performance
+emerged in the LogTrial model ($\beta^{\log t}_{P} = 0.326$, 95% CrI
+\[$0.262$, $0.393$\]). Holding the other predictors constant, this
+implies that participants were expected to improve by roughly one unit
+of performance from the beginning to the end of the task. If performance
+is interpreted on the original count scale, this corresponds
+approximately to one additional correct response. A smaller negative
+log(trial) effect on goals was also credible
+($\beta^{\log t}_{G} = -0.047$, 95% CrI \[$-0.083$, $-0.011$\]). By
+contrast, the log(trial) effect on emotions was extremely small
+($\beta^{\log t}_{E} = -0.017$, 95% CrI \[$-0.037$, $0.002$\]),
+suggesting at most a negligible downward trend over time.
+
+![Standardized Population-Level Posterior Distributions of Key
+Cross-Lagged Parameters Across Three Models. Point estimates and 95%
+credible intervals are shown. Parameters are standardized by multiplying
+the raw coefficient by the ratio of predictor to outcome standard
+deviations. The upper panel displays effects of the goal-performance
+discrepancy (GPD); $\beta^{GP \to G}$ appears only for the Hypothesized
+model (symmetric), while $\beta^{GP \to G|S}$ (success) and
+$\beta^{GP \to G|F}$ (failure) appear for Alt1 and LogTrial. The lower
+panel displays effects of emotions. The key comparison is
+$\beta^{E \to P}$: credible in the Hypothesized and Alt1 models, but no
+longer credible in the LogTrial model after controlling for practice
+effects.](../figure/fig4_std.pdf){#fig-forest width="85%"}
+
+Including the learning-curve term also reduced two other coefficients in
+the performance equation: the autoregressive effect on performance,
+$\alpha^{P}$, decreased from 0.596 in Alt1 to 0.500 in LogTrial, and the
+GPD effect on performance, $\beta^{GP \to P}$, decreased from 0.428 to
+0.369. By contrast, most other parameters remained stable across models.
+The success-failure asymmetry in goal revision
+($\beta^{GP \to G \mid S} = 0.273$; $\beta^{GP \to G \mid F} = 0.491$)
+changed very little from Alt1 to LogTrial, as did the GPD effect on
+emotions ($\beta^{GP \to E} \approx 0.128$) and the emotion effect on
+goals, $\beta^{E \to G}$. The main change introduced by log(trial),
+therefore, was concentrated in the performance equation: once practice
+was modeled directly, the previously negative emotion-to-performance
+association was markedly weakened, while a substantial learning effect
+was estimated instead.
+
+# Discussion
+
+## The Emotion-to-Performance Pathway: An Omitted Learning Curve in the Performance Equation
+
+The main implication of this reanalysis is that the negative emotion-to-performance effect reported by Lin et al. [-@lin2026dynami] was not robust to a minimal and substantively plausible learning-curve specification. In the LogTrial model, $\beta^{E \to P}$ was sharply attenuated and no longer credibly different from zero, while a strong positive learning curve in performance emerged ($\beta^{\log t}_P = 0.326$). Holding the other predictors constant, this learning-curve term implies that participants were expected to improve by roughly one unit of performance from the beginning to the end of the task, corresponding to approximately one additional correct response on the original count scale. Once this practice-related improvement was modeled directly, the empirical support for a negative effect of emotions on subsequent performance largely disappeared.
+
+This substantially weakens the original coasting interpretation. We do not argue that the coasting hypothesis is theoretically wrong. Experimental evidence suggests that positive emotions can, under some conditions, reduce effort [@thurmer2020mechan; @seo2021feelin]. Our claim is narrower and empirical: Study 1 does not provide robust evidence for coasting once a practice-related learning curve is included in the performance equation. The negative emotion-to-performance pathway is better understood as a specification-dependent result than as strong evidence that positive emotions harm later performance.
+
+The pattern of parameter change also helps localize where the confound operated. The coefficients that changed materially were all in the performance equation: the emotion effect weakened, the autoregressive coefficient decreased, and the GPD effect on performance decreased. By contrast, the time trend in emotions was negligible, and the broader self-regulation parameters changed very little. This is exactly the pattern one would expect if the original performance equation were absorbing variance from a systematic across-trial improvement that had not been modeled explicitly. In other words, the core self-regulation dynamics proposed by Lin et al. [-@lin2026dynami], including the role of the GPD in goal revision and emotional response, are not challenged by our reanalysis. What changes is specifically the interpretation of the emotion-to-performance pathway in Study 1.
+
+## Competing Influences on the Emotion-to-Performance Pathway
+
+This reinterpretation of the Study 1 finding also bears on how the cross-study pattern should be understood. If the negative $\beta^{E \to P}$ in Study 1 was an artifact, the sign reversal between Studies 1 and 2 reported by Lin et al. [-@lin2026dynami] may not reflect opposing emotional mechanisms at all. Instead, the estimated $\beta^{E \to P}$ in any given study may reflect the net balance of at least two competing influences: a genuine facilitative effect of positive emotions on performance, consistent with the broader achievement emotions literature [@pekrun2006contro; @fredrickson2001role], and a practice-related confound that pushes the estimate in the negative direction when a learning curve in performance is unmodeled.
+
+The relative strength of these two influences likely varies with design features. In Study 2, several characteristics of the task may have tilted the balance toward the genuine affective process. The exam carried high personal stakes, plausibly strengthening the motivational relevance of emotions for subsequent effort. The learning content varied across sessions and observations were spaced over days and weeks, both of which would reduce the scope for a smooth, monotonic practice curve. Under such conditions, the practice-related confound would be weaker, allowing a genuine positive emotion-to-performance link to be expressed in the estimate.
+
+Conversely, in a low-stakes repetitive task like Study 1, the genuine affective contribution to performance may be small to begin with: when the task carries little personal significance, how one feels may matter less for how one performs. At the same time, the conditions for a strong practice curve are ideal. The combination of a weak genuine effect and a strong confound would produce a negative $\beta^{E \to P}$ that disappears, as we observed, once the confound is controlled.
+
+This framework suggests that the emotion-to-performance pathway may be most interpretable in designs where practice-related structure in performance is either inherently weak or explicitly modeled. In highly repetitive paradigms, any estimated $\beta^{E \to P}$ should be treated with caution unless a learning-curve term is included as a robustness check. We note that this account is speculative and should be tested by applying explicit time trends to designs that vary systematically in task repetitiveness and personal relevance.[^4]
+
+[^4]: We could not test this prediction on Study 2 of Lin et al. [-@lin2026dynami] because the data were not publicly available at the time of analysis.
+
+## Model Comparison and Temporal Validation
+
+A second contribution of this reanalysis concerns model comparison. The issue is not simply that Lin et al. [-@lin2026dynami] relied on one criterion rather than several; if a single criterion is well matched to the data structure, that can be entirely defensible. The problem here is that the chosen criterion, WAIC, was itself diagnostically unstable in these data, and it was applied in a setting with strong temporal ordering.
+
+That matters empirically. The original preference for Alt1 over the Hypothesized model was already modest under WAIC and PSIS-LOO, and under exact LFO-CV it became small relative to its uncertainty. The LogTrial model was preferred to both alternatives under all criteria, although its advantage over Alt1 was notably smaller under LFO-CV than under PSIS-LOO, consistent with the expected reduction in optimistic bias when future information leakage is eliminated. That the advantage nevertheless persists under LFO-CV suggests that it reflects a genuine predictive gain rather than one inflated by the capacity of additional parameters to absorb leaked temporal information. The substantive conclusion thus depends not only on which model is fit, but also on whether the validation criterion respects the temporal structure of the data.
+
+The broader lesson is about criterion-data alignment. In longitudinal autoregressive settings, approximate criteria such as WAIC and PSIS-LOO may be informative, but they should not be treated as decisive when their diagnostics are poor or when the data have temporal structure that the criterion does not fully respect.
+
+## Implications for Computational Modeling of SRL
+
+These results have broader implications for computational modeling in self-regulated learning. First, autoregressive structure does not by itself solve the problem of omitted temporal structure. All three models in this study were autoregressive, yet the performance equation still benefited substantially from an explicit learning-curve term. Lagged outcomes capture local persistence, but they do not necessarily capture a global trend driven by practice, habituation, fatigue, or task familiarization. In repeated-measures SRL designs, omitting such structure can distort the interpretation of cross-lagged pathways.
+
+Second, the present case highlights a form of temporal confounding that is distinct from the stable between-person confounds emphasized in recent methodological work on longitudinal models [@murayama2025thinki]. Here, the problem was not an unobserved stable trait, but a systematic process tied to measurement order. Such confounding can arise even in well-specified hierarchical autoregressive models if the repeated-task structure itself generates a substantial learning curve in one or more of the modeled outcomes.
+
+Third, the present findings argue for a closer connection between substantive theory and validation strategy. When the theoretical question concerns prediction from temporally ordered data, the preferred model-comparison criterion should preserve that ordering. Otherwise, cross-lagged parameters may appear more decisive than they are.
+
+## Limitations
+
+Several limitations should be noted. First, the learning curve was modeled as a population-level log(trial) effect rather than allowing it to vary across individuals. This choice was made for reasons of parsimony and computational stability. Preliminary attempts to estimate random log(trial) slopes led to convergence problems, likely because the number of time points per person was limited relative to the added individual-level complexity. The fixed-effect specification was nevertheless sufficient for the present purpose, namely to test whether a simple learning-curve term altered the key substantive conclusion.
+
+Second, exact LFO-CV is computationally demanding. In our application, with 20 blocks and 15 refits, the cost was manageable (approximately 8 hours per model), but the same approach would become burdensome for substantially longer time series. More efficient alternatives exist in principle. Bürkner et al. [-@burkner2020approx] proposed a PSIS approximation to LFO that avoids most refits, but that method was developed for comparatively simple univariate time-series settings and is not feasible for our jointly autoregressive hierarchical model, where each prediction step adds a large block of new observations and the posterior shift is too large for stable importance sampling. Sequential Monte Carlo methods could in principle recover the one-step-ahead predictive densities required for LFO as a byproduct of a single sequential run, but standard particle-based approaches face severe weight degeneracy in parameter spaces of the scale considered here (approximately 4,000+ parameters). Developing scalable approximations to LFO for complex hierarchical autoregressive models therefore remains an important methodological task.
+
+Third, our empirical reanalysis was limited to Study 1. The interpretation offered for Study 2 is theoretically plausible and generates a clear prediction, but it remains to be tested directly once those data become available.
+
+Fourth, the log(trial) term captures a global nonlinear learning curve but does not identify the underlying mechanism. The observed improvement may reflect practice, familiarity with the interface, procedural adaptation, or some combination of these. Our claim is about omitted learning-curve structure in the performance equation, not about a uniquely identified psychological process.
+
+## Conclusion
+
+Our reanalysis supports the broader dynamic framework proposed by Lin et al. [-@lin2026dynami]: goals, performance, and emotions are interrelated over time, and the goal-performance discrepancy remains central to that system. However, the specific claim that positive emotions negatively affect subsequent performance in Study 1 is not robust once a practice-related learning curve is modeled explicitly. The negative emotion-to-performance coefficient depends on how performance change over trials is specified, and it is substantially reduced once the model is given a direct way to represent across-trial improvement. This reinterpretation also offers a parsimonious account of the otherwise puzzling sign reversal between Studies 1 and 2: rather than opposite emotional mechanisms, the two studies may differ in the balance between a genuine facilitative role of emotions and a practice-related confound that depends on design features such as task repetitiveness, stakes, and temporal spacing.
+
+# References
+
+
+
+::: {#refs}
+:::
+
+# Model Specifications {#apx-a}
+
+This appendix provides the full mathematical specification of the three
+models compared in this study. All models share the same hierarchical
+Bayesian structure and differ only in the specification of the
+conditional means for goals, performance, and emotions. We first
+describe the common elements, then present the model-specific equations.
+
+## Common Structure
+
+For each transition from block $t$ to block $t+1$ ($t = 1, \ldots, 19$),
+goals ($G$), performance ($P$), and emotions ($E$) at block $t+1$ are
+modeled as jointly normally distributed, conditional on the previous
+time point:
+
+$$
+G_{t+1} \sim \mathcal{N}(\mu^G_{t+1},\; \sigma_G), \quad
+P_{t+1} \sim \mathcal{N}(\mu^P_{t+1},\; \sigma_P), \quad
+E_{t+1} \sim \mathcal{N}(\mu^E_{t+1},\; \sigma_E)
+\tag{A1}
+$$
+
+where $\sigma_G$, $\sigma_P$, and $\sigma_E$ are population-level
+residual standard deviations. Block 1 values serve as initial conditions
+and are not modeled. Each parameter $\theta$ entering the conditional
+means below is specified hierarchically via a non-centered
+parameterization: $\theta_i = \bar{\theta} + \sigma_\theta \cdot z_i$,
+where $z_i \sim \mathcal{N}(0, 1)$,
+$\bar{\theta} \sim \mathcal{N}(0, 3)$, and
+$\sigma_\theta \sim \mathcal{N}^+(0, 3)$. Subscript $i$ indexes
+participants.
+
+## Conditional Means
+
+The performance and emotion equations are shared across the Hypothesized
+and Alt1 models:
+
+$$
+\mu^P_{t+1} = \gamma^P_i + \alpha^P_i \, P_t + \beta^{GP \to P}_i \,(G_{t+1} - P_t) + \beta^{E \to P}_i \, E_t \tag{A2}
+$$
+
+$$
+\mu^E_{t+1} = \gamma^E_i + \alpha^E_i \, E_t + \beta^{GP \to E}_i \,(P_{t+1} - G_{t+1}) \tag{A3}
+$$
+
+The three models differ in the goal equation and in whether a log-trial
+trend is included, as described below.
+
+**Hypothesized Model.** The goal equation uses a single symmetric
+coefficient for the goal-performance discrepancy (GPD):
+
+$$
+\mu^G_{t+1} = \gamma^G_i + \alpha^G_i \, G_t + \beta^{GP \to G}_i \,(P_t - G_t) + \beta^{E \to G}_i \, E_t \tag{A4}
+$$
+
+**Alt1 Model.** The goal equation replaces the symmetric GPD term with
+separate coefficients for success and failure:
+
+$$
+\mu^G_{t+1} = \gamma^G_i + \alpha^G_i \, G_t + \beta^{E \to G}_i \, E_t +
+\begin{cases}
+\beta^{GP \to G|S}_i\,(P_t - G_t) & \text{if } P_t > G_t \text{ (success)} \\
+\beta^{GP \to G|F}_i \,(P_t - G_t) & \text{if } P_t \leq G_t \text{ (failure)}
+\end{cases}
+\tag{A5}
+$$
+
+**LogTrial Model.** This model extends Alt1 by adding population-level
+log-trial effects to all three conditional means. The goal equation is
+identical to Equation A5 with an additional term
+$\beta^{\log t}_G \log(t+1)$. The performance and emotion equations
+become:
+
+$$
+\mu^P_{t+1} = \gamma^P_i + \alpha^P_i \, P_t + \beta^{GP \to P}_i \,(G_{t+1} - P_t) + \beta^{E \to P}_i \, E_t + \beta^{\log t}_P \log(t+1) \tag{A6}
+$$
+
+$$
+\mu^E_{t+1} = \gamma^E_i + \alpha^E_i \, E_t + \beta^{GP \to E}_i \,(P_{t+1} - G_{t+1}) + \beta^{\log t}_E \log(t+1) \tag{A7}
+$$
+
+where $t+1$ corresponds to the block number (ranging from 2 to 20). The
+three log-trial coefficients ($\beta^{\log t}_G$,
+$\beta^{\log t}_P$, $\beta^{\log t}_E$) are population-level only, with
+no individual-level variation. This choice was made to maintain
+parsimony; see Limitations for discussion.

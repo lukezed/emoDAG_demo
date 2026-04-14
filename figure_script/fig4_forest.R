@@ -182,8 +182,17 @@ ggsave(
   width = 6.5,
   height = 7,
   units = "in",
-  dpi = 600,
+  dpi = 300,
   device = ragg::agg_png
 )
 
-cat("Successfully generated final standardized figure.\n")
+ggsave(
+  "figure/fig4_std.tiff",
+  fig4,
+  width = 6.5,
+  height = 7,
+  units = "in",
+  dpi = 300,
+  device = ragg::agg_tiff,
+  compression = "lzw"
+)

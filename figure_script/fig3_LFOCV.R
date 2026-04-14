@@ -48,5 +48,11 @@ ggsave("figure/fig3_lfo_delta.pdf", fig3,
 
 ggsave("figure/fig3_lfo_delta.png", fig3, 
        width = 5, height = 6.0, units = "in", 
-       dpi = 600, 
+       dpi = 300, 
        device = ragg::agg_png)
+
+ggsave("figure/fig3_lfo_delta.tiff", fig3, 
+       width = 5, height = 6.0, units = "in", 
+       dpi = 300, 
+       device = ragg::agg_tiff,
+       compression = "lzw")
