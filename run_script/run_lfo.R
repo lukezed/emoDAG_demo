@@ -1,7 +1,7 @@
 # run_lfo.R — Exact Leave-Future-Out CV (1-step-ahead)
 #
 # Usage: Rscript run_lfo.R <model_name>
-#   model_name: hyp, alt1, or mine1
+#   model_name: hyp, alt1, mine1, or mine2
 
 library(cmdstanr)
 library(posterior)
@@ -11,12 +11,13 @@ library(tidyverse)
 
 args <- commandArgs(trailingOnly = TRUE)
 mod_name <- if (length(args) >= 1) args[1] else "mine1"
-stopifnot(mod_name %in% c("hyp", "alt1", "mine1"))
+stopifnot(mod_name %in% c("hyp", "alt1", "mine1", "mine2"))
 
 stan_file <- c(
   hyp   = "stan/hyp_optimized.stan",
   alt1  = "stan/alt1_optimized.stan",
-  mine1 = "stan/mine1_logtrial.stan"
+  mine1 = "stan/mine1_logtrial.stan",
+  mine2 = "stan/mine2_logtrial_sym.stan"
 )[[mod_name]]
 
 cat(sprintf("=== LFO-CV for model: %s ===\n", mod_name))
@@ -65,9 +66,9 @@ make_init <- function() {
     pop_gamma_e_sd = 0.5, pop_alpha_e_sd = 0.5, pop_beta_gp_e_sd = 0.5,
     sigma_g = 1, sigma_p = 1, sigma_e = 1
   )
-  if (mod_name == "hyp") {
+  if (mod_name %in% c("hyp", "mine2")) {   # symmetric GPD
     base$pop_beta_gp_g_sd <- 0.5
-  } else {
+  } else {                                 # split success/failure (alt1, mine1)
     base$pop_beta_s_sd <- 0.5
     base$pop_beta_f_sd <- 0.5
   }

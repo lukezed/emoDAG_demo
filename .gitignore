@@ -5,9 +5,11 @@
 .DS_Store
 .quarto
 **/*.rds
-data/data.csv
+**/*.pptx
+data/
 models/*.rds
 stan/*_optimized
 stan/mine1_logtrial
+stan/mine2_logtrial_sym
 paper/
 .claude/
