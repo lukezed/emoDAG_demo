@@ -1,6 +1,6 @@
-# run_lfo.R — Exact Leave-Future-Out CV (1-step-ahead)
+# lfo_fit.R — Exact Leave-Future-Out CV (1-step-ahead)
 #
-# Usage: Rscript run_lfo.R <model_name>
+# Usage: Rscript run_script/lfo_fit.R <model_name>
 #   model_name: hyp, alt1, mine1, or mine2
 
 library(cmdstanr)

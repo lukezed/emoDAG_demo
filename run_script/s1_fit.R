@@ -1,4 +1,4 @@
-# run.R
+# s1_fit.R — Study 1: fit the 2x2 (hyp/alt1/mine1/mine2), WAIC, PSIS-LOO, parameters
 
 library(cmdstanr)
 library(posterior)
@@ -33,6 +33,7 @@ cat(sprintf("N = %d, T = %d\n", sdata$N, sdata$T))
 mod_hyp  <- cmdstan_model("stan/hyp_optimized.stan")
 mod_alt1 <- cmdstan_model("stan/alt1_optimized.stan")
 mod_m1   <- cmdstan_model("stan/mine1_logtrial.stan")
+mod_m2   <- cmdstan_model("stan/mine2_logtrial_sym.stan")  # Hyp + log(t), completes the 2x2
 
 
 # ---- Init functions ----------------------------------------------------------
@@ -89,7 +90,16 @@ fit_m1 <- mod_m1$sample(
 )
 fit_m1$save_object("models/fit_mine1.rds")
 
-# Though original study set at adapt_delta = 0.99, max_treedepth = 20, 
+# mine2 = Hyp + log(t) (symmetric GPD); reuses init_hyp (symmetric, 11 params)
+fit_m2 <- mod_m2$sample(
+  data = sdata, chains = 4, parallel_chains = 4,
+  iter_warmup = 1000, iter_sampling = 1000,
+  adapt_delta = 0.95, max_treedepth = 15, seed = 2026,
+  init = init_hyp
+)
+fit_m2$save_object("models/fit_mine2.rds")
+
+# Though original study set at adapt_delta = 0.99, max_treedepth = 20,
 # the model can work well under 0.95/15.
 
 
@@ -102,6 +112,9 @@ fit_alt1$cmdstan_diagnose()
 # No problems detected: no divergences, E-BFMI OK, R-hat OK, ESS OK
 
 fit_m1$cmdstan_diagnose()
+# No problems detected: no divergences, E-BFMI OK, R-hat OK, ESS OK
+
+fit_m2$cmdstan_diagnose()
 # No problems detected: no divergences, E-BFMI OK, R-hat OK, ESS OK
 
 # ---- WAIC comparison ----------------------------------------------------------
@@ -158,7 +171,7 @@ loo_m1
 # LOO Pareto k values appear lower than expected because iter_sampling=1000
 # (4000 total draws). With higher draws the bad k counts may change.
 # Regardless, the autoregressive structure means LOO allows future
-# information leakage — LFO-CV is the appropriate method (see run_lfo.R).
+# information leakage — LFO-CV is the appropriate method (see lfo_fit.R).
 
 
 loo_compare(list(alt1 = loo_alt1, mine1 = loo_m1, hyp = loo_hyp))
@@ -291,3 +304,47 @@ print(fit_m1$summary(variables = mine1_vars,
 # The goal equation (success/failure asymmetry) and emotion equation are
 # robust to this correction.
 
+
+
+# ---- mine2 (Hyp + log(t)) and the 2x2 model comparison -----------------------
+# mine2 completes the factorial: {symmetric, split GPD} x {no logT, logT}.
+# Question: once a log(trial) term is added, is the success/failure asymmetry
+# still supported (mine1 = split+logT vs mine2 = symmetric+logT)?
+
+waic_m2 <- waic(fit_m2$draws("log_lik", format = "matrix"))
+loo_m2  <- fit_m2$loo(variables = "log_lik")
+print(waic_m2)
+print(loo_m2)
+# mine2 WAIC ~ 53,308; Pareto k pattern as unreliable as the others.
+
+loo_compare(list(hyp = loo_hyp, alt1 = loo_alt1, mine1 = loo_m1, mine2 = loo_m2))
+#       elpd_diff se_diff
+# mine1    0.0       0.0
+# mine2  -81.7      32.4
+# alt1   -99.8      12.4
+# hyp   -177.2      33.8
+# -> mine1 (split+logT) best; mine2 (sym+logT) beats alt1 (split,noT):
+#    log(t) matters more than the asymmetry under PSIS-LOO.
+
+loo_compare(list(mine1 = loo_m1, mine2 = loo_m2))
+#       elpd_diff se_diff
+# mine1   0.0       0.0
+# mine2 -81.7      32.4   (2.5 SE: asymmetry still preferred under PSIS-LOO)
+
+loo_model_weights(list(hyp = loo_hyp, alt1 = loo_alt1, mine1 = loo_m1, mine2 = loo_m2))
+# mine1 0.726  mine2 0.274  alt1 0.000  hyp 0.000
+
+m2_vars <- c(pop_vars(fit_m2), "beta_lt_g", "beta_lt_p", "beta_lt_e")
+print(fit_m2$summary(variables = m2_vars,
+                     mean = mean, median = median,
+                     q2.5 = ~quantile(.x, 0.025),
+                     q97.5 = ~quantile(.x, 0.975)), n = 30)
+# Key: beta_e_p = -0.042 [-0.115, 0.030]  (NOT credible, mirrors mine1 -0.043)
+#      beta_lt_p =  0.326 [ 0.259, 0.393]  (same strong practice effect)
+# -> the disappearance of beta_E->P does NOT depend on the GPD specification.
+#
+# NOTE: the LFO verdict on asymmetry (mine1 vs mine2) is the one that matters
+# for the paper; PSIS-LOO here is leaky. See lfo_fit.R / lfo_compare.R:
+# under exact LFO, mine1 > mine2 by 62.1 (SE 20.8, 3.0 SE) -> asymmetry IS
+# supported once practice is modelled (reframe: confirm asymmetry, overturn
+# the emotion-to-performance conclusion).

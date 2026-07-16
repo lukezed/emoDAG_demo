@@ -1,6 +1,6 @@
-# prep_study2.R — build Study 2 analysis data in Study-1 format
+# s2_prep.R — build Study 2 analysis data in Study-1 format
 #
-# Usage: Rscript run_script/prep_study2.R [pre|post]   (default: pre)
+# Usage: Rscript run_script/s2_prep.R [pre|post]   (default: pre)
 # Output: data/data2_<group>.csv (subj, block, goals, perfs, emots),
 # so every existing Study-1 Stan model and run script works unchanged.
 #

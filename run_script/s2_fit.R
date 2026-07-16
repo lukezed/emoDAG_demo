@@ -1,13 +1,43 @@
-# run_study2.R — Study 2 (pre-learning emotions), 2x2 model space
+# s2_fit.R — Study 2 (pre-/post-learning emotions), 2x2 model space
 #
 # Reuses the Study 1 Stan models unchanged (Study 2 data is in Study-1 format).
-#   alt1  = split GPD,     no logT   <- baseline, must recover Lin's beta_e_p = +0.018
+#   alt1  = split GPD,     no logT   <- baseline, recovers Lin's beta_e_p = +0.018
 #   mine1 = split GPD,     + logT
 #   hyp   = symmetric GPD, no logT
 #   mine2 = symmetric GPD, + logT
 #
-# Usage: Rscript run_script/run_study2.R <pre|post> [model ...]
+# Usage: Rscript run_script/s2_fit.R <pre|post> [model ...]
 #   default models: all four (alt1 first). Fits saved as fit_s2<group>_<name>.rds
+#
+# ---------------------------------------------------------------------------
+# RESULTS (population beta_E->P and beta_logt_P; 4 chains, 1000+1000, seed 2026)
+#
+# PRE group (N=303, T=8553) -- primary; pipeline reproduces Lin's pre baseline:
+#   sigma_g 0.343, sigma_p 0.388 (exact), alpha_p ~0.70, beta_gp_p ~0.63 == Lin
+#
+#   model          beta_E->P [95% CrI]        beta_logt_P [95% CrI]
+#   alt1 (base)    +0.017 [ 0.001, 0.033]     --
+#   mine1 (+logT)  +0.020 [ 0.004, 0.037]     0.025 [0.013, 0.036]
+#   hyp  (base)    +0.017 [ 0.001, 0.034]     --
+#   mine2 (+logT)  +0.020 [ 0.003, 0.036]     0.025 [0.013, 0.037]
+#
+#   -> the positive effect is ROBUST to log(session): stays credibly positive
+#      (and robust to split/symmetric GPD). Standardised beta_E->P ~ +0.028.
+#      Contrast Study 1, where the negative effect is NOT robust (attenuates to
+#      non-credible). Practice gain on performance is comparable across studies
+#      (S2 ~+8-9 attempted Qs, ~+10%; S1 ~+12%). Do not compare raw beta shifts
+#      across studies (different scales); report robustness, not shift size.
+#
+# POST group (N=295) -- negative control (Lin post baseline beta_E->P ~ -0.004 ns):
+#   alt1 (base)    -0.007 [-0.019, 0.004]     --
+#   mine1 (+logT)  -0.006 [-0.018, 0.005]     0.023 [0.012, 0.035]
+#   -> null baseline stays null under log(session); practice term manufactures
+#      no spurious effect.
+#
+# Convergence: all population means R-hat < 1.01; two individual-level SD
+# hyperparameters (pop_gamma_p_sd, pop_beta_e_p_sd) reach ~1.01 in some fits,
+# not affecting population inference.
+# ---------------------------------------------------------------------------
 
 library(cmdstanr)
 library(posterior)
@@ -20,7 +50,7 @@ group <- if (length(argv) >= 1) argv[1] else "pre"
 stopifnot(group %in% c("pre", "post"))
 sel <- argv[-1]
 
-# ---- Data (Study-1 format from prep_study2.R) --------------------------------
+# ---- Data (Study-1 format from s2_prep.R) --------------------------------
 df <- read_csv(sprintf("data/data2_%s.csv", group), show_col_types = FALSE) |>
   arrange(subj, block)
 block1 <- df |> filter(block == 1) |> arrange(subj)
