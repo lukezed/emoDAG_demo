@@ -45,8 +45,16 @@ cmp("mine1", "alt1")    # log-trial, split
 cmp("mine2", "hyp")     # log-trial, symmetric
 cmp("alt1",  "hyp")     # asymmetry, no logT
 
-# ---- RESULTS (fill in after s2_lfo.R has run for all models) -----------------
-# group=pre:
-#   (pending run)
-# group=post:
-#   (pending run)
+# ---- RESULTS ------------------------------------------------------------------
+# group=pre (L=10, sessions 11-38, 5826 matched forecasts/model):
+#   Totals: mine2 -10468.5 > hyp -10492.7 > mine1 -10569.4 > alt1 -10595.9
+#   mine1 - alt1 :   26.45  SE  11.63  (2.3 SE)  log-trial helps (split)
+#   mine2 - hyp  :   24.18  SE  10.17  (2.4 SE)  log-trial helps (symmetric)
+#   mine1 - mine2: -100.93  SE 101.35  (-1.0 SE) asymmetry indistinguishable
+#   alt1  - hyp  : -103.19  SE  98.40  (-1.0 SE) asymmetry indistinguishable
+#   -> practice term improves prediction in BOTH studies; the asymmetry is
+#      supported under LFO only in Study 1 (with logT; 3.0 SE) and cannot be
+#      distinguished in Study 2 (paired SE ~10x the practice contrasts, driven
+#      mainly by sessions 14-15). See paper Appendix B tables.
+# group=post: not run (control group's contribution is the parameter null;
+#   no model-selection claim rests on it).
