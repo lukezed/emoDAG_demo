@@ -1,0 +1,55 @@
+% fig5_dag.tex — practice-trend misspecification diagram (standalone)
+% Compile: xelatex fig5_dag.tex  ->  move fig5_dag.pdf to figure/
+\documentclass[tikz,border=8pt]{standalone}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\usetikzlibrary{positioning,arrows.meta}
+
+\begin{document}
+\begin{tikzpicture}[
+  node distance = 14mm and 20mm,
+  var/.style  = {draw, rounded corners=2pt, minimum width=13mm, minimum height=7.5mm, font=\small},
+  ghost/.style= {draw, dashed, gray, rounded corners=2pt, minimum width=17mm, minimum height=7.5mm, font=\small\color{gray}},
+  lab/.style  = {font=\footnotesize, midway},
+  arr/.style  = {-{Stealth[length=2.2mm]}, semithick},
+  hot/.style  = {-{Stealth[length=2.6mm]}, line width=1.1pt, red!75!black},
+  cold/.style = {-{Stealth[length=2.2mm]}, gray},
+  panel/.style= {font=\small\bfseries}
+]
+
+% ---------------- Panel (a): practice unmodeled ----------------
+\begin{scope}
+  \node[panel] at (18mm,20mm) {(a) Practice unmodeled};
+  \node[var] (Pt)  at (0,0)        {$P_t$};
+  \node[var] (Et)  at (0,-16mm)    {$E_t$};
+  \node[var] (Gt1) at (18mm,10mm)  {$G_{t+1}$};
+  \node[var] (Pt1) at (36mm,0)     {$P_{t+1}$};
+  \node[ghost] (Tr) at (18mm,-28mm){$\log t$};
+
+  \draw[arr]  (Pt)  -- node[lab, above]{$\alpha^{P}$} (Pt1);
+  \draw[arr]  (Gt1) -- node[lab, above right=-1mm]{$\beta^{GP\to P}$} (Pt1);
+  \draw[hot]  (Et)  -- node[lab, pos=0.38, below=1.6mm, sloped]{$\beta^{E\to P}=-0.10$} (Pt1);
+  \draw[cold, dashed] (Tr) -- node[lab, pos=0.28, right=1.4mm]{unmodeled ($+$)} (Pt1);
+  \draw[cold, dashed, {Stealth[length=2mm]}-{Stealth[length=2mm]}] (Tr.west) to[bend left=25]
+       node[lab, left=1mm]{$-$} (Et.south);
+\end{scope}
+
+% ---------------- Panel (b): practice modeled ----------------
+\begin{scope}[xshift=68mm]
+  \node[panel] at (18mm,20mm) {(b) Practice modeled};
+  \node[var] (Pt2)  at (0,0)        {$P_t$};
+  \node[var] (Et2)  at (0,-16mm)    {$E_t$};
+  \node[var] (Gt12) at (18mm,10mm)  {$G_{t+1}$};
+  \node[var] (Pt12) at (36mm,0)     {$P_{t+1}$};
+  \node[var] (Tr2)  at (18mm,-28mm) {$\log t$};
+
+  \draw[arr]  (Pt2)  -- node[lab, above]{$\alpha^{P}$} (Pt12);
+  \draw[arr]  (Gt12) -- node[lab, above right=-1mm]{$\beta^{GP\to P}$} (Pt12);
+  \draw[cold] (Et2)  -- node[lab, pos=0.38, below=1.6mm, sloped]{$\beta^{E\to P}\approx 0$} (Pt12);
+  \draw[arr]  (Tr2)  -- node[lab, pos=0.30, right=1.4mm]{$\beta^{\log t}_{P}=+0.33$} (Pt12);
+  \draw[cold, dashed, {Stealth[length=2mm]}-{Stealth[length=2mm]}] (Tr2.west) to[bend left=25]
+       node[lab, left=1mm]{$-$} (Et2.south);
+\end{scope}
+
+\end{tikzpicture}
+\end{document}
