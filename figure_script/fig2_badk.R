@@ -2,6 +2,18 @@ library(tidyverse)
 library(loo)
 library(patchwork)
 
+# standalone: compute loo objects from saved fits if not in session (repo root)
+if (!exists("loo_hyp")) {
+  loo_from <- function(f) {
+    ll <- readRDS(f)$draws("log_lik", format = "matrix")
+    loo(ll, r_eff = relative_eff(exp(ll), chain_id = rep(1:4, each = 1000)))
+  }
+  loo_hyp  <- loo_from("models/fit_hyp.rds")
+  loo_alt1 <- loo_from("models/fit_alt1.rds")
+  loo_m1   <- loo_from("models/fit_mine1.rds")
+  loo_m2   <- loo_from("models/fit_mine2.rds")
+}
+
 # ============================================================================
 # Panels a–c: plot(loo) returns a ggplot, patch them together
 # ============================================================================
@@ -38,12 +50,13 @@ make_k_plot <- function(loo_obj, title_label) {
 }
 
 
-pa <- make_k_plot(loo_hyp, "Hypothesized")
-pb <- make_k_plot(loo_alt1, "Alternate 1")
-pc <- make_k_plot(loo_m1, "Log Trial")
+pa <- make_k_plot(loo_hyp, "Hyp")
+pb <- make_k_plot(loo_alt1, "Alt1")
+pc <- make_k_plot(loo_m2, "Hyp + log t")
+pd <- make_k_plot(loo_m1, "Alt1 + log t")
 
 
-fig2 <- (pa | pb) / (pc | plot_spacer()) +
+fig2 <- (pa | pb) / (pc | pd) +
   plot_annotation(
     tag_levels = 'a', 
     tag_prefix = '(', 

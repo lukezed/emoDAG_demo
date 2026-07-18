@@ -63,12 +63,12 @@ raw_draws <- bind_rows(
       "pop_beta_f", "pop_beta_e_g", "pop_beta_gp_e")
   ),
   get_draws(
-    fit_m2, "Hyp+logT",
+    fit_m2, "Hyp+log t",
     c("pop_beta_e_p", "pop_beta_gp_p", "pop_beta_gp_g",
       "pop_beta_e_g", "pop_beta_gp_e")
   ),
   get_draws(
-    fit_m1, "LogT",
+    fit_m1, "Alt1+log t",
     c("pop_beta_e_p", "pop_beta_gp_p", "pop_beta_s",
       "pop_beta_f", "pop_beta_e_g", "pop_beta_gp_e")
   )
@@ -92,7 +92,7 @@ draws_std <- raw_draws |>
       panel,
       levels = c("Effects of the GPD", "Effects of Emotions")
     ),
-    model = factor(model, levels = c("Hyp", "Alt1", "Hyp+logT", "LogT"))
+    model = factor(model, levels = c("Hyp", "Alt1", "Hyp+log t", "Alt1+log t"))
   )
 
 # ============================================================================
@@ -100,10 +100,10 @@ draws_std <- raw_draws |>
 # ============================================================================
 
 model_fills <- c(
-  "Hyp"      = "#E6A817",
-  "Alt1"     = "#6497B1",
-  "Hyp+logT" = "#4E8265",
-  "LogT"     = "#482677"
+  "Hyp"        = "#E6A817",
+  "Alt1"       = "#6497B1",
+  "Hyp+log t"  = "#4E8265",
+  "Alt1+log t" = "#482677"
 )
 
 fig4 <- ggplot(draws_std, aes(x = plot_value, y = label, fill = model)) +
