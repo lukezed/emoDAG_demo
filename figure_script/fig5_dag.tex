@@ -1,4 +1,4 @@
-% fig5_dag.tex — practice-trend misspecification diagram (standalone)
+% fig5_dag.tex — practice as a confounder of the emotion-performance path
 % Compile: xelatex fig5_dag.tex  ->  move fig5_dag.pdf to figure/
 \documentclass[tikz,border=8pt]{standalone}
 \usepackage{fontspec}
@@ -7,48 +7,40 @@
 
 \begin{document}
 \begin{tikzpicture}[
-  node distance = 14mm and 20mm,
-  var/.style  = {draw, rounded corners=2pt, minimum width=13mm, minimum height=7.5mm, font=\small},
-  ghost/.style= {draw, dashed, gray, rounded corners=2pt, minimum width=17mm, minimum height=7.5mm, font=\small\color{gray}},
-  lab/.style  = {font=\footnotesize, midway},
-  arr/.style  = {-{Stealth[length=2.2mm]}, semithick},
-  hot/.style  = {-{Stealth[length=2.6mm]}, line width=1.1pt, red!75!black},
-  cold/.style = {-{Stealth[length=2.2mm]}, gray},
+  var/.style  = {draw, rounded corners=2pt, minimum width=15mm, minimum height=8mm, font=\small},
+  ghost/.style= {draw, dashed, gray, rounded corners=2pt, minimum width=15mm, minimum height=8mm, font=\small\color{gray}},
+  lab/.style  = {font=\scriptsize},
+  arr/.style  = {-{Stealth[length=2.4mm]}, semithick},
+  gharr/.style= {-{Stealth[length=2.4mm]}, semithick, gray, dashed},
+  hot/.style  = {-{Stealth[length=2.8mm]}, line width=1.1pt, red!75!black},
+  cold/.style = {-{Stealth[length=2.4mm]}, gray},
   panel/.style= {font=\small\bfseries}
 ]
 
-% ---------------- Panel (a): practice unmodeled ----------------
+% ================= Panel (a): practice unmodeled =================
 \begin{scope}
-  \node[panel] at (18mm,20mm) {(a) Practice unmodeled};
-  \node[var] (Pt)  at (0,0)        {$P_t$};
-  \node[var] (Et)  at (0,-16mm)    {$E_t$};
-  \node[var] (Gt1) at (18mm,10mm)  {$G_{t+1}$};
-  \node[var] (Pt1) at (36mm,0)     {$P_{t+1}$};
-  \node[ghost] (Tr) at (18mm,-28mm){$\log t$};
+  \node[panel] at (21mm,26mm) {(a) Practice unmodeled};
+  \node[ghost] (T)  at (21mm,15mm) {$\log t$};
+  \node[var]   (E)  at (0,0)       {$E_t$};
+  \node[var]   (P)  at (42mm,0)    {$P_{t+1}$};
 
-  \draw[arr]  (Pt)  -- node[lab, above]{$\alpha^{P}$} (Pt1);
-  \draw[arr]  (Gt1) -- node[lab, above right=-1mm]{$\beta^{GP\to P}$} (Pt1);
-  \draw[hot]  (Et)  -- node[lab, pos=0.38, below=1.6mm, sloped]{$\beta^{E\to P}=-0.10$} (Pt1);
-  \draw[cold, dashed] (Tr) -- node[lab, pos=0.28, right=1.4mm]{unmodeled ($+$)} (Pt1);
-  \draw[cold, dashed, {Stealth[length=2mm]}-{Stealth[length=2mm]}] (Tr.west) to[bend left=25]
-       node[lab, left=1mm]{$-$} (Et.south);
+  \draw[gharr] (T) -- node[lab, above left=-1mm, gray]{$-$} (E);
+  \draw[gharr] (T) -- node[lab, above right=-1mm, gray]{$+$} (P);
+  \draw[hot]   (E) -- node[lab, below=2mm]{$\beta^{E\to P}=-0.10$} (P);
+  \node[lab, gray, align=center] at (21mm,-12mm) {back-door open (spurious $\beta^{E\to P}$)};
 \end{scope}
 
-% ---------------- Panel (b): practice modeled ----------------
-\begin{scope}[xshift=68mm]
-  \node[panel] at (18mm,20mm) {(b) Practice modeled};
-  \node[var] (Pt2)  at (0,0)        {$P_t$};
-  \node[var] (Et2)  at (0,-16mm)    {$E_t$};
-  \node[var] (Gt12) at (18mm,10mm)  {$G_{t+1}$};
-  \node[var] (Pt12) at (36mm,0)     {$P_{t+1}$};
-  \node[var] (Tr2)  at (18mm,-28mm) {$\log t$};
+% ================= Panel (b): practice modeled =================
+\begin{scope}[xshift=74mm]
+  \node[panel] at (21mm,26mm) {(b) Practice modeled};
+  \node[var]   (T2) at (21mm,15mm) {$\log t$};
+  \node[var]   (E2) at (0,0)       {$E_t$};
+  \node[var]   (P2) at (42mm,0)    {$P_{t+1}$};
 
-  \draw[arr]  (Pt2)  -- node[lab, above]{$\alpha^{P}$} (Pt12);
-  \draw[arr]  (Gt12) -- node[lab, above right=-1mm]{$\beta^{GP\to P}$} (Pt12);
-  \draw[cold] (Et2)  -- node[lab, pos=0.38, below=1.6mm, sloped]{$\beta^{E\to P}\approx 0$} (Pt12);
-  \draw[arr]  (Tr2)  -- node[lab, pos=0.30, right=1.4mm]{$\beta^{\log t}_{P}=+0.33$} (Pt12);
-  \draw[cold, dashed, {Stealth[length=2mm]}-{Stealth[length=2mm]}] (Tr2.west) to[bend left=25]
-       node[lab, left=1mm]{$-$} (Et2.south);
+  \draw[arr]  (T2) -- node[lab, above left=-1mm]{$-$} (E2);
+  \draw[arr]  (T2) -- node[lab, above right=-1mm]{$\beta^{\log t}_{P}=+0.33$} (P2);
+  \draw[cold] (E2) -- node[lab, below=2mm]{$\beta^{E\to P}\approx 0$} (P2);
+  \node[lab, gray, align=center] at (21mm,-12mm) {back-door blocked};
 \end{scope}
 
 \end{tikzpicture}
