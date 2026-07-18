@@ -47,6 +47,8 @@ cmp("alt1",  "hyp")     # asymmetry, no logT
 
 # ---- RESULTS ------------------------------------------------------------------
 # group=pre (L=10, sessions 11-38, 5826 matched forecasts/model):
+#   NOTE: paper reports session-CLUSTERED SEs (13.8/11.5/97.2/94.1); below are
+#   observation-level (same conclusions).
 #   Totals: mine2 -10468.5 > hyp -10492.7 > mine1 -10569.4 > alt1 -10595.9
 #   mine1 - alt1 :   26.45  SE  11.63  (2.3 SE)  log-trial helps (split)
 #   mine2 - hyp  :   24.18  SE  10.17  (2.4 SE)  log-trial helps (symmetric)

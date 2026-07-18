@@ -13,7 +13,7 @@
 # RESULTS (population beta_E->P and beta_logt_P; 4 chains, 1000+1000, seed 2026)
 #
 # PRE group (N=303, T=8553) -- primary; pipeline reproduces Lin's pre baseline:
-#   sigma_g 0.343, sigma_p 0.388 (exact), alpha_p ~0.70, beta_gp_p ~0.63 == Lin
+#   sigma 0.343/0.388 exact in the pre-shift validation run; aligned run 0.341/0.385, alpha_p ~0.70, beta_gp_p ~0.63 == Lin
 #
 #   model          beta_E->P [95% CrI]        beta_logt_P [95% CrI]
 #   alt1 (base)    +0.017 [ 0.001, 0.033]     --
