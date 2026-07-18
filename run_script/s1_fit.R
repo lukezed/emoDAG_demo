@@ -315,7 +315,12 @@ waic_m2 <- waic(fit_m2$draws("log_lik", format = "matrix"))
 loo_m2  <- fit_m2$loo(variables = "log_lik")
 print(waic_m2)
 print(loo_m2)
-# mine2 WAIC ~ 53,308; Pareto k pattern as unreliable as the others.
+# mine2 WAIC = 53,304.4 (se 1,154.3), 16.9% p_waic > 0.4;
+# Pareto k: k>0.7: 106 (1.6%), k>1.0: 20 (0.3%) — as unreliable as the others.
+# Pairwise WAIC elpd diffs (paired SE): mine1-mine2 104.7 (31.1),
+# mine2-hyp 90.0 (11.4), mine2-alt1 10.8 (34.7).
+# Pairwise LOO: mine2-hyp 95.6 (11.7). Pairwise stacking: mine1 .717/mine2 .283;
+# mine2 1.000/hyp .000.
 
 loo_compare(list(hyp = loo_hyp, alt1 = loo_alt1, mine1 = loo_m1, mine2 = loo_m2))
 #       elpd_diff se_diff

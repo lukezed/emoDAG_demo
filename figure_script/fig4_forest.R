@@ -4,6 +4,13 @@ library(ggdist)
 library(ggtext)
 library(grid)
 
+# standalone: load fits and data if not already in the session (run from repo root)
+if (!exists("fit_hyp"))  fit_hyp  <- readRDS("models/fit_hyp.rds")
+if (!exists("fit_alt1")) fit_alt1 <- readRDS("models/fit_alt1.rds")
+if (!exists("fit_m1"))   fit_m1   <- readRDS("models/fit_mine1.rds")
+if (!exists("fit_m2"))   fit_m2   <- readRDS("models/fit_mine2.rds")
+if (!exists("df") || !is.data.frame(df)) df <- read_csv("data/data.csv", show_col_types = FALSE)
+
 # ============================================================================
 # 1. SD for standardization
 # ============================================================================
@@ -56,6 +63,11 @@ raw_draws <- bind_rows(
       "pop_beta_f", "pop_beta_e_g", "pop_beta_gp_e")
   ),
   get_draws(
+    fit_m2, "Hyp+logT",
+    c("pop_beta_e_p", "pop_beta_gp_p", "pop_beta_gp_g",
+      "pop_beta_e_g", "pop_beta_gp_e")
+  ),
+  get_draws(
     fit_m1, "LogT",
     c("pop_beta_e_p", "pop_beta_gp_p", "pop_beta_s",
       "pop_beta_f", "pop_beta_e_g", "pop_beta_gp_e")
@@ -80,7 +92,7 @@ draws_std <- raw_draws |>
       panel,
       levels = c("Effects of the GPD", "Effects of Emotions")
     ),
-    model = factor(model, levels = c("Hyp", "Alt1", "LogT"))
+    model = factor(model, levels = c("Hyp", "Alt1", "Hyp+logT", "LogT"))
   )
 
 # ============================================================================
@@ -88,9 +100,10 @@ draws_std <- raw_draws |>
 # ============================================================================
 
 model_fills <- c(
-  "Hyp"  = "#E6A817",
-  "Alt1" = "#6497B1",
-  "LogT" = "#482677"
+  "Hyp"      = "#E6A817",
+  "Alt1"     = "#6497B1",
+  "Hyp+logT" = "#4E8265",
+  "LogT"     = "#482677"
 )
 
 fig4 <- ggplot(draws_std, aes(x = plot_value, y = label, fill = model)) +
@@ -131,7 +144,7 @@ fig4 <- ggplot(draws_std, aes(x = plot_value, y = label, fill = model)) +
   theme_classic(base_size = 10, base_family = "Arial") +
   theme(
     legend.position = "inside",
-    legend.position.inside = c(0.88, 0.01),
+    legend.position.inside = c(0.82, 0.01),
     legend.justification = c(0, 0),
     legend.direction = "vertical",
     
