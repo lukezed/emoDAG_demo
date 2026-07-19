@@ -1,7 +1,9 @@
 # s1_sim_check.R — generative check for the confound mechanism (Appendix)
 # Simulate from the fitted LogT (mine1) posterior with beta_E->P := 0, fit
 # Alt1 (no practice term): does a spurious ~ -0.10 emerge?
-# Usage: Rscript run_script/s1_sim_check.R [n_reps]
+# Usage: Rscript run_script/s1_sim_check.R [n_reps] [model]
+#   model: alt1 (default; misspecified, no practice term) | mine1 (correct
+#   model; recovery check: should return beta_E->P ~ 0, beta_lt_p ~ 0.326)
 #
 # Simulated trajectories are truncated to generous physical bounds
 # (g in [0,60], p in [0,50], e in [-3,3]). The fitted linear system is
@@ -11,6 +13,8 @@
 # bounds and keeps the fit geometry sane. Disclose in the appendix.
 suppressMessages({library(cmdstanr); library(posterior); library(tidyverse)})
 args <- commandArgs(trailingOnly=TRUE); n_reps <- if (length(args)) as.integer(args[1]) else 3L
+model <- if (length(args) >= 2) args[2] else "alt1"
+stopifnot(model %in% c("alt1", "mine1"))
 
 df <- read_csv("data/data.csv", show_col_types=FALSE) |> arrange(subj, block)
 b1 <- df |> filter(block==1) |> arrange(subj); N <- nrow(b1)
@@ -45,7 +49,7 @@ sim_once <- function(seed) {
   bind_rows(out)
 }
 
-mod <- cmdstan_model("stan/alt1_optimized.stan")
+mod <- cmdstan_model(if (model == "alt1") "stan/alt1_optimized.stan" else "stan/mine1_logtrial.stan")
 init_a <- function() list(pop_gamma_g_sd=0.5,pop_alpha_g_sd=0.5,pop_beta_s_sd=0.5,
   pop_beta_f_sd=0.5,pop_beta_e_g_sd=0.5,pop_gamma_p_sd=0.5,pop_alpha_p_sd=0.5,
   pop_beta_gp_p_sd=0.5,pop_beta_e_p_sd=0.5,pop_gamma_e_sd=0.5,pop_alpha_e_sd=0.5,
@@ -58,11 +62,21 @@ res <- map_dfr(seq_len(n_reps), function(r) {
     g=rest$goals, p=rest$perfs, e=rest$emots)
   f <- mod$sample(data=sdata, chains=4, parallel_chains=4, iter_warmup=1000,
     iter_sampling=1000, adapt_delta=0.95, max_treedepth=15, seed=2026, init=init_a, refresh=0)
-  q <- quantile(f$draws("pop_beta_e_p", format="matrix"), c(.025,.5,.975))
-  cat(sprintf("rep %d: beta_E->P = %.3f [%.3f, %.3f]\n", r, q[2], q[1], q[3]))
-  tibble(rep=r, median=q[2], lo=q[1], hi=q[3])
+  qv <- function(v) quantile(f$draws(v, format="matrix"), c(.025,.5,.975))
+  q <- qv("pop_beta_e_p")
+  row <- tibble(rep=r, median=q[2], lo=q[1], hi=q[3])
+  if (model == "mine1") {
+    ql <- qv("beta_lt_p"); qe <- qv("beta_lt_e")
+    row <- row |> mutate(lt_p=ql[2], lt_p_lo=ql[1], lt_p_hi=ql[3],
+                         lt_e=qe[2], lt_e_lo=qe[1], lt_e_hi=qe[3])
+    cat(sprintf("rep %d: beta_E->P = %.3f [%.3f, %.3f], beta_lt_p = %.3f [%.3f, %.3f]\n",
+                r, q[2], q[1], q[3], ql[2], ql[1], ql[3]))
+  } else {
+    cat(sprintf("rep %d: beta_E->P = %.3f [%.3f, %.3f]\n", r, q[2], q[1], q[3]))
+  }
+  row
 })
-write_csv(res, "models/sim_check_results.csv")
+write_csv(res, sprintf("models/sim_check_results%s.csv", if (model == "alt1") "" else "_mine1"))
 cat("DONE. True value 0; original spurious estimate -0.104.\n")
 
 # ---- RESULTS (10 reps, seeds 2027-2036; fits seed 2026, 0.95/15) -------------
