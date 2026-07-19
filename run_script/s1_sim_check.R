@@ -2,6 +2,13 @@
 # Simulate from the fitted LogT (mine1) posterior with beta_E->P := 0, fit
 # Alt1 (no practice term): does a spurious ~ -0.10 emerge?
 # Usage: Rscript run_script/s1_sim_check.R [n_reps]
+#
+# Simulated trajectories are truncated to generous physical bounds
+# (g in [0,60], p in [0,50], e in [-3,3]). The fitted linear system is
+# dynamically explosive for a few participants' median parameters
+# (unbounded simulation reaches |g| ~ 4e4), while the real task is
+# bounded by block time and the rating scale; truncation mimics those
+# bounds and keeps the fit geometry sane. Disclose in the appendix.
 suppressMessages({library(cmdstanr); library(posterior); library(tidyverse)})
 args <- commandArgs(trailingOnly=TRUE); n_reps <- if (length(args)) as.integer(args[1]) else 3L
 
@@ -17,6 +24,8 @@ pop <- sapply(c("beta_lt_g","beta_lt_p","beta_lt_e","sigma_g","sigma_p","sigma_e
               function(v) median(fit$draws(v, format="matrix")))
 rm(fit); gc()
 
+clamp <- function(x, lo, hi) pmin(pmax(x, lo), hi)
+
 sim_once <- function(seed) {
   set.seed(seed); out <- vector("list", N)
   for (i in 1:N) {
@@ -24,12 +33,12 @@ sim_once <- function(seed) {
     g[1] <- b1$goals[i]; p[1] <- b1$perfs[i]; e[1] <- b1$emots[i]
     for (t in 2:20) {
       d <- p[t-1]-g[t-1]; lt <- log(t)
-      g[t] <- rnorm(1, ind$gamma_g[i]+ind$alpha_g[i]*g[t-1]+ind$beta_gp_s[i]*max(d,0)+
-                      ind$beta_gp_f[i]*min(d,0)+ind$beta_e_g[i]*e[t-1]+pop["beta_lt_g"]*lt, pop["sigma_g"])
-      p[t] <- rnorm(1, ind$gamma_p[i]+ind$alpha_p[i]*p[t-1]+ind$beta_gp_p[i]*(g[t]-p[t-1])+
-                      0*e[t-1]+pop["beta_lt_p"]*lt, pop["sigma_p"])   # beta_E->P = 0
-      e[t] <- rnorm(1, ind$gamma_e[i]+ind$alpha_e[i]*e[t-1]+ind$beta_gp_e[i]*(p[t]-g[t])+
-                      pop["beta_lt_e"]*lt, pop["sigma_e"])
+      g[t] <- clamp(rnorm(1, ind$gamma_g[i]+ind$alpha_g[i]*g[t-1]+ind$beta_gp_s[i]*max(d,0)+
+                      ind$beta_gp_f[i]*min(d,0)+ind$beta_e_g[i]*e[t-1]+pop["beta_lt_g"]*lt, pop["sigma_g"]), 0, 60)
+      p[t] <- clamp(rnorm(1, ind$gamma_p[i]+ind$alpha_p[i]*p[t-1]+ind$beta_gp_p[i]*(g[t]-p[t-1])+
+                      0*e[t-1]+pop["beta_lt_p"]*lt, pop["sigma_p"]), 0, 50)   # beta_E->P = 0
+      e[t] <- clamp(rnorm(1, ind$gamma_e[i]+ind$alpha_e[i]*e[t-1]+ind$beta_gp_e[i]*(p[t]-g[t])+
+                      pop["beta_lt_e"]*lt, pop["sigma_e"]), -3, 3)
     }
     out[[i]] <- tibble(subj=b1$subj[i], block=1:20, goals=g, perfs=p, emots=e)
   }
@@ -55,3 +64,15 @@ res <- map_dfr(seq_len(n_reps), function(r) {
 })
 write_csv(res, "models/sim_check_results.csv")
 cat("DONE. True value 0; original spurious estimate -0.104.\n")
+
+# ---- RESULTS (3 reps, seeds 2027-2029; fits seed 2026, 0.95/15) --------------
+# rep 1: beta_E->P = -0.082 [-0.142, -0.022]  credibly negative
+# rep 2: beta_E->P = -0.061 [-0.122, -0.002]  credibly negative
+# rep 3: beta_E->P = -0.016 [-0.076, 0.043]   negative, not credible
+# -> fitting Alt1 (no practice term) to data with a TRUE null emotion->perf
+#    path recovers spuriously negative estimates, credibly so in 2/3 reps.
+#    Variability across reps matches the weak emotion drift that opens the
+#    back door (beta_lt_e ~ -0.017). NOTE: unbounded simulation from the
+#    median parameters is dynamically explosive for a few participants
+#    (|g| ~ 4e4); trajectories are truncated to physical bounds, touched
+#    for ~0.3% of g/p values and ~4% of e values.
