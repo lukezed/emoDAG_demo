@@ -65,14 +65,15 @@ res <- map_dfr(seq_len(n_reps), function(r) {
 write_csv(res, "models/sim_check_results.csv")
 cat("DONE. True value 0; original spurious estimate -0.104.\n")
 
-# ---- RESULTS (3 reps, seeds 2027-2029; fits seed 2026, 0.95/15) --------------
-# rep 1: beta_E->P = -0.082 [-0.142, -0.022]  credibly negative
-# rep 2: beta_E->P = -0.061 [-0.122, -0.002]  credibly negative
-# rep 3: beta_E->P = -0.016 [-0.076, 0.043]   negative, not credible
-# -> fitting Alt1 (no practice term) to data with a TRUE null emotion->perf
-#    path recovers spuriously negative estimates, credibly so in 2/3 reps.
-#    Variability across reps matches the weak emotion drift that opens the
-#    back door (beta_lt_e ~ -0.017). NOTE: unbounded simulation from the
-#    median parameters is dynamically explosive for a few participants
-#    (|g| ~ 4e4); trajectories are truncated to physical bounds, touched
-#    for ~0.3% of g/p values and ~4% of e values.
+# ---- RESULTS (10 reps, seeds 2027-2036; fits seed 2026, 0.95/15) -------------
+# medians: -0.082 -0.061 -0.016 -0.028 -0.052 -0.096 -0.028 +0.014 -0.043 -0.070
+# negative in 9/10 (median -0.048); credibly negative in 4/10
+# (reps 1, 2, 6, 10; largest -0.096 [-0.154, -0.037]).
+# -> with a TRUE null emotion->perf path, omitting the practice term biases
+#    the estimate negative by ~ -0.05 on average, matching the real-data
+#    attenuation when logT is added (-0.104 -> -0.043). Variability across
+#    reps reflects the weak emotion drift that opens the back door
+#    (beta_lt_e ~ -0.017). NOTE: unbounded simulation from the median
+#    parameters is dynamically explosive for a few participants (|g| ~ 4e4);
+#    trajectories are truncated to physical bounds, touched for ~0.3% of
+#    g/p values and ~4% of e values.
