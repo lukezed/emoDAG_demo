@@ -83,7 +83,7 @@ cat("DONE. True value 0; original spurious estimate -0.104.\n")
 
 # ---- RESULTS (10 reps, seeds 2027-2036; fits seed 2026, 0.95/15) -------------
 # medians: -0.082 -0.061 -0.016 -0.028 -0.052 -0.096 -0.028 +0.014 -0.043 -0.070
-# negative in 9/10 (median -0.048); credibly negative in 4/10
+# negative in 9/10 (median -0.047); credibly negative in 4/10
 # (reps 1, 2, 6, 10; largest -0.096 [-0.154, -0.037]).
 # -> with a TRUE null emotion->perf path, omitting the practice term biases
 #    the estimate negative by ~ -0.05 on average, matching the real-data
