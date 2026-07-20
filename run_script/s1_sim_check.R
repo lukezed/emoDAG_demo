@@ -74,9 +74,11 @@ res <- map_dfr(seq_len(n_reps), function(r) {
   } else {
     cat(sprintf("rep %d: beta_E->P = %.3f [%.3f, %.3f]\n", r, q[2], q[1], q[3]))
   }
+  # append per rep so an interrupted run keeps its finished reps
+  outfile <- sprintf("models/sim_check_results%s.csv", if (model == "alt1") "" else "_mine1")
+  write_csv(row, outfile, append = file.exists(outfile))
   row
 })
-write_csv(res, sprintf("models/sim_check_results%s.csv", if (model == "alt1") "" else "_mine1"))
 cat("DONE. True value 0; original spurious estimate -0.104.\n")
 
 # ---- RESULTS (10 reps, seeds 2027-2036; fits seed 2026, 0.95/15) -------------
@@ -91,3 +93,14 @@ cat("DONE. True value 0; original spurious estimate -0.104.\n")
 #    parameters is dynamically explosive for a few participants (|g| ~ 4e4);
 #    trajectories are truncated to physical bounds, touched for ~0.3% of
 #    g/p values and ~4% of e values.
+#
+# ---- RESULTS, mine1 recovery arm (same 10 datasets) --------------------------
+# beta_E->P medians: -0.053 -0.028 +0.007 +0.019 -0.027 -0.058 +0.012 +0.044
+#                    -0.007 -0.045  (median -0.017; 9/10 CrIs cover 0, rep 6
+#                    grazes it, upper limit -0.0001)
+# beta_lt_p medians: 0.334 0.305 0.237 0.393 0.282 0.293 0.321 0.277 0.304
+#                    0.276  (all credibly positive; 8/10 CrIs cover the
+#                    generating 0.326; slight downward shift ~ truncation)
+# -> the generating model reads the same data correctly: null emotion path
+#    recovered, practice effect recovered. Paired with the alt1 arm this
+#    completes the recovery contrast reported in Appendix D.
