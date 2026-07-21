@@ -151,7 +151,7 @@ loo_compare(list(hyp = waic_hyp, alt1 = waic_alt1))
 
 #       elpd_diff se_diff
 # alt1     0.0       0.0
-# hyp    -79.7      34.0
+# hyp    -79.2      34.0 (recomputed from pointwise; earlier -79.7 was a transcription error)
 
 # ---- LOO comparison ----------------------------------------------------------
 
