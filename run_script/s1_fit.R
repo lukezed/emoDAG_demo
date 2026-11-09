@@ -76,7 +76,7 @@ fit_hyp$save_object("models/fit_hyp.rds")
 fit_alt1 <- mod_alt1$sample(
   data = sdata, chains = 4, parallel_chains = 4,
   iter_warmup = 1000, iter_sampling = 1000,
-  adapt_delta = 0.95, max_treedepth = 20, seed = 2026,
+  adapt_delta = 0.95, max_treedepth = 15, seed = 2026,
   init = init_alt1
 )
 fit_alt1$save_object("models/fit_alt1.rds")

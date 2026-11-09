@@ -4,6 +4,14 @@ Code and results for "Does Positive Affect Impair Subsequent Performance? A Prac
 
 The manuscript refits the computational model of goals, performance, and affect of Lin et al. (2026) to both of their datasets, adds practice terms (log of the trial number) to each equation, compares the models by leave-one-group-out (LOGO) cross-validation, and uses simulation to test whether omitting the practice terms biases the affect-to-performance path.
 
+## Main results
+
+- **Study 1** (arithmetic task, 357 adults, 20 blocks). The affect-to-performance path in Alt1 was −0.104 [−0.174, −0.036] without practice terms and −0.043 [−0.114, 0.028] with them.
+- **Study 2** (examination preparation, 303 medical students, up to 40 sessions). The path stayed positive: 0.017 [0.001, 0.033] without practice terms and 0.020 [0.004, 0.037] with them.
+- **Prediction.** The practice terms improved prediction for held-out participants in both studies (LOGO ΔELPD 34 to 49, each more than three standard errors).
+- **Simulation.** With a true path of zero, the model without practice terms gave a negative estimate in 90 of 100 datasets and a credibly negative estimate in 18. The model with practice terms recovered both zero and a true path of −0.10.
+- **Time coding.** The results were the same with a linear trend or a separate indicator for each block.
+
 ## Data
 
 Neither dataset is included in this repository.
