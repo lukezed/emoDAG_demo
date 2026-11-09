@@ -8,8 +8,11 @@
 **/*.pptx
 data/
 models/*.rds
-stan/*_optimized
-stan/mine1_logtrial
-stan/mine2_logtrial_sym
+# compiled Stan executables (rebuilt by cmdstanr)
+stan/*
+!stan/*.stan
 paper/
 .claude/
+models/*.log
+models/SIM_RESUME.md
+*.Rcheck

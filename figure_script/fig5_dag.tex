@@ -12,35 +12,33 @@
   lab/.style  = {font=\scriptsize},
   arr/.style  = {-{Stealth[length=2.4mm]}, semithick},
   gharr/.style= {-{Stealth[length=2.4mm]}, semithick, gray, dashed},
-  hot/.style  = {-{Stealth[length=2.8mm]}, line width=1.1pt, red!75!black},
-  cold/.style = {-{Stealth[length=2.4mm]}, gray},
   panel/.style= {font=\small\bfseries}
 ]
 
 % ================= Panel (a): practice unmodeled =================
 \begin{scope}
-  \node[panel] at (21mm,26mm) {(a) Practice unmodeled};
-  \node[ghost] (T)  at (21mm,15mm) {$\log t$};
-  \node[var]   (E)  at (0,0)       {$E_t$};
-  \node[var]   (P)  at (42mm,0)    {$P_{t+1}$};
+  \node[panel] at (21mm,26mm) {(a) Without a practice term};
+  \node[ghost] (T)  at (21mm,15mm) {$t$};
+  \node[var]   (E)  at (0,0)       {$E_{t-1}$};
+  \node[var]   (P)  at (42mm,0)    {$P_t$};
 
   \draw[gharr] (T) -- node[lab, above left=-1mm, gray]{$-$} (E);
   \draw[gharr] (T) -- node[lab, above right=-1mm, gray]{$+$} (P);
-  \draw[hot]   (E) -- node[lab, below=2mm]{$\beta^{E\to P}=-0.10$} (P);
-  \node[lab, gray, align=center] at (21mm,-12mm) {back-door open (spurious $\beta^{E\to P}$)};
+  \draw[arr]   (E) -- node[lab, below=2mm]{$\beta^{E\to P}$} (P);
+  \node[lab, gray, align=center] at (21mm,-12mm) {back-door open};
 \end{scope}
 
 % ================= Panel (b): practice modeled =================
 \begin{scope}[xshift=74mm]
-  \node[panel] at (21mm,26mm) {(b) Practice modeled};
-  \node[var]   (T2) at (21mm,15mm) {$\log t$};
-  \node[var]   (E2) at (0,0)       {$E_t$};
-  \node[var]   (P2) at (42mm,0)    {$P_{t+1}$};
+  \node[panel] at (21mm,26mm) {(b) With a practice term};
+  \node[var]   (T2) at (21mm,15mm) {$t$};
+  \node[var]   (E2) at (0,0)       {$E_{t-1}$};
+  \node[var]   (P2) at (42mm,0)    {$P_t$};
 
   \draw[arr]  (T2) -- node[lab, above left=-1mm]{$-$} (E2);
-  \draw[arr]  (T2) -- node[lab, above right=-1mm]{$\beta^{\log t}_{P}=+0.33$} (P2);
-  \draw[cold] (E2) -- node[lab, below=2mm]{$\beta^{E\to P}\approx 0$} (P2);
-  \node[lab, gray, align=center] at (21mm,-12mm) {back-door blocked};
+  \draw[arr]  (T2) -- node[lab, above right=-1mm]{$+$} (P2);
+  \draw[arr]  (E2) -- node[lab, below=2mm]{$\beta^{E\to P}$} (P2);
+  \node[lab, gray, align=center] at (21mm,-12mm) {back-door closed};
 \end{scope}
 
 \end{tikzpicture}

@@ -1,0 +1,49 @@
+% fig5b_dag_estimates.tex — estimates on the confound diagram, both studies (Discussion)
+% Alt1 (no practice term) and Alt1+log t; Study 2 pre-session set.
+% Compile: xelatex fig5b_dag_estimates.tex  ->  move the pdf to figure/
+\documentclass[tikz,border=8pt]{standalone}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\usetikzlibrary{positioning,arrows.meta}
+
+\begin{document}
+\begin{tikzpicture}[
+  var/.style  = {draw, rounded corners=2pt, minimum width=15mm, minimum height=8mm, font=\small},
+  ghost/.style= {draw, dashed, gray, rounded corners=2pt, minimum width=15mm, minimum height=8mm, font=\small\color{gray}},
+  lab/.style  = {font=\scriptsize, text=black},
+  arr/.style  = {-{Stealth[length=2.4mm]}, semithick},
+  gharr/.style= {-{Stealth[length=2.4mm]}, semithick, gray, dashed},
+  pathneg/.style = {-{Stealth[length=2.8mm]}, line width=1.1pt, red!75!black},
+  pathpos/.style = {-{Stealth[length=2.8mm]}, line width=1.1pt, blue!70!black},
+  cold/.style = {-{Stealth[length=2.4mm]}, gray},
+  panel/.style= {font=\small\bfseries}
+]
+% #1 x shift, #2 y shift, #3 title, #4 path style, #5 path label
+\newcommand{\without}[5]{
+\begin{scope}[xshift=#1, yshift=#2]
+  \node[panel] at (21mm,26mm) {#3};
+  \node[ghost] (T)  at (21mm,15mm) {$t$};
+  \node[var]   (E)  at (0,0)       {$E_{t-1}$};
+  \node[var]   (P)  at (42mm,0)    {$P_t$};
+  \draw[gharr] (T) -- node[lab, above left=-1mm]{$-$} (E);
+  \draw[gharr] (T) -- node[lab, above right=-1mm]{$+$} (P);
+  \draw[#4]    (E) -- node[lab, below=2mm]{#5} (P);
+\end{scope}}
+% #1 x shift, #2 y shift, #3 title, #4 path style, #5 path label, #6 t->E style, #7 t->E label, #8 t->P label
+\newcommand{\withterm}[8]{
+\begin{scope}[xshift=#1, yshift=#2]
+  \node[panel] at (21mm,26mm) {#3};
+  \node[var]   (T)  at (21mm,15mm) {$\log t$};
+  \node[var]   (E)  at (0,0)       {$E_{t-1}$};
+  \node[var]   (P)  at (42mm,0)    {$P_t$};
+  \draw[#6]    (T) -- node[lab, above left=-1mm]{#7} (E);
+  \draw[arr]   (T) -- node[lab, above right=-1mm]{#8} (P);
+  \draw[#4]    (E) -- node[lab, below=2mm]{#5} (P);
+\end{scope}}
+
+\without{0mm}{0mm}{(a) Study 1, without a practice term}{pathneg}{$\beta^{E\to P}=-0.104$}
+\withterm{74mm}{0mm}{(b) Study 1, with a practice term}{cold}{$\beta^{E\to P}=-0.043$}{cold}{$\beta^{\log t}_{E}=-0.017$}{$\beta^{\log t}_{P}=0.326$}
+\without{0mm}{-46mm}{(c) Study 2, without a practice term}{pathpos}{$\beta^{E\to P}=0.017$}
+\withterm{74mm}{-46mm}{(d) Study 2, with a practice term}{pathpos}{$\beta^{E\to P}=0.020$}{arr}{$\beta^{\log t}_{E}=-0.055$}{$\beta^{\log t}_{P}=0.025$}
+\end{tikzpicture}
+\end{document}

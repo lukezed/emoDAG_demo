@@ -1,11 +1,21 @@
 # fig6_s2_badk.R — Pareto-k diagnostic plot for Study 2 (pre) PSIS-LOO
-# Input: models/s2_pareto_k.rds (from the loo diagnostics run; long: model, obs, k)
+# Input: models/s2_pareto_k.rds (long: model, obs, k), built here from the
+# Study 2 pre-session fits if missing
 # Mirrors fig2_badk.R styling. Output: figure/fig6_s2_pareto_k.pdf (appendix)
 
 library(tidyverse)
 library(patchwork)
 
-pk <- readRDS("models/s2_pareto_k.rds")
+pk_file <- "models/s2_pareto_k.rds"
+if (!file.exists(pk_file)) {
+  pk_from <- function(m) {
+    ll <- readRDS(sprintf("models/fit_s2pre_%s.rds", m))$draws("log_lik", format = "matrix")
+    k <- loo::loo(ll, r_eff = loo::relative_eff(exp(ll), chain_id = rep(1:4, each = 1000)))$diagnostics$pareto_k
+    tibble(model = m, obs = seq_along(k), k = k)
+  }
+  saveRDS(map_dfr(c("hyp", "alt1", "mine1", "mine2"), pk_from), pk_file)
+}
+pk <- readRDS(pk_file)
 
 make_k_plot <- function(df, title_label) {
   df <- df |> mutate(kcat = case_when(k > 1.0 ~ "k > 1.0",

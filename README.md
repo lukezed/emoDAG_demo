@@ -1,92 +1,80 @@
 # emoDAG_demo
 
-Reanalysis of Lin et al. (2026), "The Dynamic Interplay Between Goal Setting, Performance, and Emotions in Self-Regulated Learning" (*Journal of Educational Psychology*). 
+Code and results for "Does Positive Affect Impair Subsequent Performance? A Practice Confound in Learning Studies" (Zhang, under review).
 
-## What this project does
-
-I reanalyze Lin et al. (2026), Study 1 in full and Study 2 as an extension, and show that:
-
-1. Study 1's reported negative emotion-to-performance effect is not robust to a log(trial) learning curve; a practice effect accounts for it.
-2. The apparent sign reversal of the emotion-to-performance effect across the two studies reflects practice confounding rather than opposing emotional mechanisms. Once a time trend is modelled, the effect is near-null in Study 1 and a small positive in Study 2.
-3. WAIC and PSIS-LOO, as used in the original study, are diagnostically unreliable for this class of autoregressive models; exact leave-future-out cross-validation (LFO-CV) is used instead. Under LFO-CV the goal-revision asymmetry (Alt1) is supported, while the emotion-to-performance conclusion is not.
+The manuscript refits the computational model of goals, performance, and affect of Lin et al. (2026) to both of their datasets, adds practice terms (log of the trial number) to each equation, compares the models by leave-one-group-out (LOGO) cross-validation, and uses simulation to test whether omitting the practice terms biases the affect-to-performance path.
 
 ## Data
 
-Study 1 data are from Lin et al. (2026), publicly available at [https://osf.io/qc6hm/](https://osf.io/qc6hm/); download `data.csv` into `data/`. Study 2 data are from Breitwieser et al. (2022) (the source dataset for Lin et al.'s Study 2); place the raw file as `data2.csv` in `data/`, then run `s2_prep.R`. Neither dataset is redistributed in this repository.
+Neither dataset is included in this repository.
 
-## Project structure
+- **Study 1** is openly available from the repository of Lin et al. at <https://osf.io/qc6hm/>. Download `data.csv` into `data/`.
+- **Study 2** comes from Breitwieser et al. (2022) and was shared by its authors under a license that does not permit redistribution. With the raw file saved as `data/data2.csv`, `run_script/s2_prep.R` builds the analysis data.
+
+## Structure
 
 ```
-├── stan/                      # Stan model files (2x2: symmetric/split GPD x no/with log-trial)
-│   ├── hyp_optimized.stan     # Hyp   — symmetric GPD, no log-trial
-│   ├── alt1_optimized.stan    # Alt1  — split success/failure, no log-trial
-│   ├── mine1_logtrial.stan    # LogT  — Alt1 + log(t) effects
-│   └── mine2_logtrial_sym.stan# Hyp + log(t) effects (completes the 2x2)
-├── run_script/                # named <study>_<step>: s1_/s2_ by study, lfo_ shared
-│   ├── s1_fit.R               # Study 1: fit the 2x2 (hyp/alt1/mine1/mine2), WAIC, PSIS-LOO, parameters
-│   ├── s2_prep.R              # Study 2: build analysis data (scaling + emotion index)
-│   ├── s2_fit.R               # Study 2: fit the 2x2 for pre/post emotions
-│   ├── lfo_fit.R              # Exact LFO-CV, one model at a time (either study)
-│   └── lfo_compare.R          # Aggregate and compare LFO results
-├── figure_script/
-│   ├── fig2_badk.R            # Pareto k diagnostic plots
-│   ├── fig3_LFOCV.R           # LFO per-block ΔELPD bar charts
-│   └── fig4_forest.R          # Standardized posterior forest plot
-├── models/                    # Saved model fits and LFO results (.rds, .csv)
-├── figure/                    # Output figures (.pdf, .png)
-├── paper/                     # Manuscript (Quarto/apaquarto)
-├── csf/                       # HPC job scripts (University of Manchester CSF)
-└── data/                      # Place data.csv (Study 1) / data2.csv (Study 2) here (not tracked)
+stan/              Stan models
+  hyp_optimized.stan       Hyp: symmetric goal-performance coefficient
+  alt1_optimized.stan      Alt1: separate coefficients for goal success and failure
+  mine2_logtrial_sym.stan  Hyp + log t
+  mine1_logtrial.stan      Alt1 + log t
+  mine1_timeX.stan         Alt1 with a linear or block-indicator coding of time
+  sim_alt1.stan            Alt1 for the simulation fits
+  sim_mine1.stan           Alt1 + log t for the simulation fits
+run_script/
+  s1_fit.R                 Study 1: fit the four models; WAIC, PSIS-LOO, parameters
+  s2_prep.R                Study 2: build the analysis data
+  s2_fit.R                 Study 2: fit the four models (pre- or post-session affect)
+  logo.R                   LOGO cross-validation (PSIS with exact refits)
+  time_coding.R            alternative codings of time
+  s1_sim_check.R           simulation with a known affect-to-performance path
+  s1_sim_describe.R        simulated vs real Study 1 data (Appendix D)
+figure_script/     figure code (R and TikZ)
+figure/            figures used in the manuscript
+models/            result tables (.csv); model fits (.rds) are not tracked
+archive/lfo/       earlier leave-future-out analysis, not used in the manuscript
 ```
 
-## How to reproduce
+In the scripts, `mine1` is Alt1 + log t and `mine2` is Hyp + log t.
 
-**Prerequisites:** R (≥ 4.3), [CmdStan](https://mc-stan.org/cmdstanr/), and the following R packages: `cmdstanr`, `posterior`, `loo`, `tidyverse`, `ggdist`, `ggtext`, `patchwork`.
+## Reproducing the results
 
-**Step 1: Fit Study 1 models and compute WAIC/LOO.**
+Requirements: R (≥ 4.3), CmdStan via [`cmdstanr`](https://mc-stan.org/cmdstanr/), and the packages `posterior`, `loo`, `tidyverse`, `ggdist`, `ggtext`, and `patchwork`. Run all scripts from the repository root. Each script's header documents its arguments, and key results are recorded in comments.
 
-```r
-source("run_script/s1_fit.R")   # fits the 2x2: hyp, alt1, mine1, mine2
+```sh
+# Study 1: fit the four models (saved to models/fit_*.rds)
+Rscript run_script/s1_fit.R
+
+# Study 2: build the data, then fit the four models
+Rscript run_script/s2_prep.R pre
+Rscript run_script/s2_prep.R post
+Rscript run_script/s2_fit.R pre
+Rscript run_script/s2_fit.R post alt1 mine1
+
+# LOGO cross-validation (Table 2); "refit" runs the exact refits
+Rscript run_script/logo.R s1 refit
+Rscript run_script/logo.R s2pre refit
+
+# Alternative codings of time (Table 4)
+Rscript run_script/time_coding.R s1 linear
+Rscript run_script/time_coding.R s1 dummies
+Rscript run_script/time_coding.R s2pre linear
+Rscript run_script/time_coding.R s2pre dummies
+
+# Simulation (Table 5, Appendix D): reps, fitted model, true path
+Rscript run_script/s1_sim_check.R 1:100 alt1 0
+Rscript run_script/s1_sim_check.R 1:100 mine1 0
+Rscript run_script/s1_sim_check.R 1:100 mine1 -0.10
+Rscript run_script/s1_sim_describe.R
 ```
 
-This prints WAIC, PSIS-LOO, stacking weights, and parameter estimates. Key results are recorded in the comments of the script.
+Dataset `r` of the simulation uses seed `2026 + r`. Results append to the CSV files in `models/`, so an interrupted run can be resumed with the missing range.
 
-**Step 2: Run exact LFO-CV (Study 1).**
+Figures: `figure_script/fig4_forest.R`, `fig2_badk.R`, and `fig6_s2_badk.R` read the saved fits; the two diagrams are compiled with `xelatex figure_script/fig5_dag.tex` and `xelatex figure_script/fig5b_dag_estimates.tex`.
 
-```r
-# One model at a time (each takes ~8 hours):
-Rscript run_script/lfo_fit.R hyp
-Rscript run_script/lfo_fit.R alt1
-Rscript run_script/lfo_fit.R mine1
-Rscript run_script/lfo_fit.R mine2
+## References
 
-# Then aggregate:
-source("run_script/lfo_compare.R")
-```
-
-**Step 3: Study 2 reanalysis.**
-
-```r
-# Build Study 2 data (place data2.csv in data/ first), then fit the 2x2:
-Rscript run_script/s2_prep.R pre      # -> data/data2_pre.csv
-Rscript run_script/s2_prep.R post     # -> data/data2_post.csv
-Rscript run_script/s2_fit.R pre       # fit the pre-emotion 2x2
-Rscript run_script/s2_fit.R post alt1 mine1   # post-emotion control
-```
-
-The Study 2 pipeline recovers Lin et al.'s reported Study 2 baseline; results are recorded in the comments of `s2_fit.R`.
-
-**Step 4: Generate figures.**
-
-```r
-# After s1_fit.R and lfo_compare.R have been run:
-source("figure_script/fig2_badk.R")
-source("figure_script/fig3_LFOCV.R")
-source("figure_script/fig4_forest.R")
-```
-
-Most numerical results are available as comments in `run_script/s1_fit.R`, `lfo_fit.R`, and `s2_fit.R` without rerunning the models. Pre-computed model fits are saved in `models/`.
-
-## Reference
+Breitwieser, J., Neubauer, A. B., Schmiedek, F., & Brod, G. (2022). Self-regulation prompts promote the achievement of learning goals – but only briefly: Uncovering hidden dynamics in the effects of a psychological intervention. *Learning and Instruction, 80*, 101560. https://doi.org/10.1016/j.learninstruc.2021.101560
 
 Lin, W. M., FitzGibbon, L., Theobald, M., Breitwieser, J., Brod, G., Murayama, K., & Sakaki, M. (2026). The dynamic interplay between goal setting, performance, and emotions in self-regulated learning: A computational modeling approach. *Journal of Educational Psychology*. https://doi.org/10.1037/edu0001022
