@@ -1,8 +1,8 @@
 # emoDAG_demo
 
-Code and results for "Does Positive Affect Impair Subsequent Performance? A Practice Confound in Learning Studies" (Zhang, under review).
+Code and results for "Does Positive Affect Impair Subsequent Performance? A Practice Confound in Two Learning Studies" (Zhang, under review).
 
-The manuscript refits the computational model of goals, performance, and affect of Lin et al. (2026) to both of their datasets, adds practice terms (log of the trial number) to each equation, compares the models by leave-one-group-out (LOGO) cross-validation, and uses simulation to test whether omitting the practice terms biases the affect-to-performance path.
+The manuscript refits the computational model of goals, performance, and affect of Lin et al. (2026) to both of their datasets, adds practice terms (log of the episode number) to each equation, compares the models by leave-one-group-out (LOGO) cross-validation, and uses simulation to test whether omitting the practice terms biases the affect-to-performance path.
 
 ## Main results
 
@@ -10,7 +10,7 @@ The manuscript refits the computational model of goals, performance, and affect 
 - **Study 2** (examination preparation, 303 medical students, up to 40 sessions). The path stayed positive: 0.017 [0.001, 0.033] without practice terms and 0.020 [0.004, 0.037] with them.
 - **Prediction.** The practice terms improved prediction for held-out participants in both studies (LOGO ΔELPD 34 to 49, each more than three standard errors).
 - **Simulation.** With a true path of zero, the model without practice terms gave a negative estimate in 90 of 100 datasets and a credibly negative estimate in 18. The model with practice terms recovered both zero and a true path of −0.10.
-- **Time coding.** The results were the same with a linear trend or a separate indicator for each block.
+- **Time coding.** The results were the same with a linear trend or a separate indicator for each block or session.
 
 ## Data
 
@@ -39,7 +39,10 @@ run_script/
   s1_sim_check.R           simulation with a known affect-to-performance path
   s1_sim_describe.R        simulated vs real Study 1 data (Appendix D)
 figure_script/     figure code (R and TikZ)
-figure/            figures used in the manuscript
+figure/            figures used in the manuscript (file names predate the final
+                   numbering: fig5_dag = Figure 1, fig4_std = Figure 3,
+                   fig5b_dag_estimates = Figure 4, fig2_pareto_k = Figure C1,
+                   fig6_s2_pareto_k = Figure C2)
 models/            result tables (.csv); model fits (.rds) are not tracked
 archive/lfo/       earlier leave-future-out analysis, not used in the manuscript
 ```

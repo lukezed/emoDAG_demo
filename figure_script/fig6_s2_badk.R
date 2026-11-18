@@ -40,10 +40,10 @@ make_k_plot <- function(df, title_label) {
     theme(plot.title = element_text(size = 9, face = "bold"))
 }
 
-pa <- make_k_plot(filter(pk, model == "hyp"),   "Hypothesized")
-pb <- make_k_plot(filter(pk, model == "alt1"),  "Alternate 1")
-pc <- make_k_plot(filter(pk, model == "mine2"), "Hyp + log(t)")
-pd <- make_k_plot(filter(pk, model == "mine1"), "Alt1 + log(t)")
+pa <- make_k_plot(filter(pk, model == "hyp"),   "Hyp")
+pb <- make_k_plot(filter(pk, model == "alt1"),  "Alt1")
+pc <- make_k_plot(filter(pk, model == "mine2"), "Hyp + log t")
+pd <- make_k_plot(filter(pk, model == "mine1"), "Alt1 + log t")
 
 fig6 <- (pa | pb) / (pc | pd) +
   plot_annotation(tag_levels = 'a', tag_prefix = '(', tag_suffix = ')') +

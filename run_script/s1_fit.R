@@ -170,8 +170,9 @@ loo_m1
 #
 # LOO Pareto k values appear lower than expected because iter_sampling=1000
 # (4000 total draws). With higher draws the bad k counts may change.
-# Regardless, the autoregressive structure means LOO allows future
-# information leakage — LFO-CV is the appropriate method (see lfo_fit.R).
+# Pointwise LOO leaves out single observations, so the rest of the same
+# person's series still informs the prediction; the manuscript compares
+# models by leave-one-group-out CV instead (run_script/logo.R).
 
 
 loo_compare(list(alt1 = loo_alt1, mine1 = loo_m1, hyp = loo_hyp))
@@ -282,13 +283,13 @@ print(fit_m1$summary(variables = mine1_vars,
 #
 # log(trial) fixed effects:
 # beta_lt_g            -0.047     [-0.083,-0.011]      goals decrease over time *
-# beta_lt_p             0.326     [ 0.262, 0.393]      *** STRONG practice effect ***
+# beta_lt_p             0.326     [ 0.262, 0.393]      credible practice effect
 # beta_lt_e            -0.017     [-0.037, 0.002]      emotions: marginal (CrI includes 0)
 
 # ---- Key finding -------------------------------------------------------------
 # The negative emotion -> performance effect (beta_e_p = -0.104, 95% CrI
 # [-0.174, -0.036]) reported in the original paper (both hyp and alt1)
-# becomes non-significant (beta_e_p = -0.043, 95% CrI [-0.114, 0.028])
+# is no longer credible (beta_e_p = -0.043, 95% CrI [-0.114, 0.028])
 # after controlling for a log(trial) learning curve.
 #
 # The original authors explained this effect via the "coasting hypothesis"
@@ -348,8 +349,6 @@ print(fit_m2$summary(variables = m2_vars,
 #      beta_lt_p =  0.326 [ 0.259, 0.393]  (same strong practice effect)
 # -> the disappearance of beta_E->P does NOT depend on the GPD specification.
 #
-# NOTE: the LFO verdict on asymmetry (mine1 vs mine2) is the one that matters
-# for the paper; PSIS-LOO here is leaky. See lfo_fit.R / lfo_compare.R:
-# under exact LFO, mine1 > mine2 by 62.1 (SE 20.8, 3.0 SE) -> asymmetry IS
-# supported once practice is modelled (reframe: confirm asymmetry, overturn
-# the emotion-to-performance conclusion).
+# Model comparison for the manuscript uses leave-one-group-out CV
+# (run_script/logo.R); an earlier leave-future-out analysis is kept in
+# archive/lfo/ and is not used in the manuscript.

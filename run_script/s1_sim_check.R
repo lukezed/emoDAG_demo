@@ -99,31 +99,11 @@ res <- map_dfr(reps, function(r) {
 })
 cat(sprintf("DONE. True value %.2f; original estimate -0.104.\n", beta_true))
 
-# ---- RESULTS (10 reps, seeds 2027-2036; fits seed 2026, 0.95/15) -------------
-# medians: -0.082 -0.061 -0.016 -0.028 -0.052 -0.096 -0.028 +0.014 -0.043 -0.070
-# negative in 9/10 (median -0.047); credibly negative in 4/10
-# (reps 1, 2, 6, 10; largest -0.096 [-0.154, -0.037]).
-# -> with a TRUE null emotion->perf path, omitting the practice term biases
-#    the estimate negative by ~ -0.05 on average, matching the real-data
-#    attenuation when logT is added (-0.104 -> -0.043). Variability across
-#    reps reflects the weak emotion drift that opens the back door
-#    (beta_lt_e ~ -0.017). NOTE: unbounded simulation from the median
-#    parameters is dynamically explosive for a few participants (|g| ~ 4e4);
-#    trajectories are truncated to physical bounds, touched for ~0.3% of
-#    g/p values and ~4% of e values.
+# Unbounded simulation from the median parameters is dynamically explosive
+# for a few participants (|g| ~ 4e4); trajectories are truncated to physical
+# bounds, touching ~0.3% of g/p values and ~4% of e values.
 #
-# ---- RESULTS, mine1 recovery arm (same 10 datasets) --------------------------
-# beta_E->P medians: -0.053 -0.028 +0.007 +0.019 -0.027 -0.058 +0.012 +0.044
-#                    -0.007 -0.045  (median -0.017; 9/10 CrIs cover 0, rep 6
-#                    grazes it, upper limit -0.0001)
-# beta_lt_p medians: 0.334 0.305 0.237 0.393 0.282 0.293 0.321 0.277 0.304
-#                    0.276  (all credibly positive; 8/10 CrIs cover the
-#                    generating 0.326; slight downward shift ~ truncation)
-# -> the generating model reads the same data correctly: null emotion path
-#    recovered, practice effect recovered. Paired with the alt1 arm this
-#    completes the recovery contrast reported in Appendix D.
-#
-# ---- RESULTS, 100 reps per arm (supersedes the 10-rep summaries above) -------
+# ---- RESULTS, 100 reps per arm ----------------------------------------------
 # arm (truth, fitted)      mean beta_E->P (MCSE)  negative  cred. neg  covers truth
 # 0,     alt1              -0.035 (0.003)          90/100    18/100     82/100
 # 0,     mine1              0.000 (0.003)          48/100     2/100     98/100

@@ -1,7 +1,6 @@
 # logo.R — PSIS leave-one-group-out (person) CV for the 2x2 model space
 #
-# Target: a new learner (cold start given block-1 values), complementing LFO
-# (next block of observed learners). Person effects are integrated out
+# Target: a new learner (cold start given block-1 values). Person effects are integrated out
 # analytically: every equation is linear in its person-level coefficients
 # given the observed regressors, coefficients are independent Gaussians, and
 # residuals are independent across equations, so per person and equation
@@ -163,4 +162,4 @@ cat("Goal asymmetry:\n");  pair("hyp", "alt1"); pair("mine2", "mine1")
 #   Hyp  -> Alt1            88.1 (29.8) z 2.96      32.7 (14.1) z 2.32
 #   Hyp+log t -> Alt1+log t 82.0 (32.6) z 2.51      30.5 (16.5) z 1.85
 # -> practice term credible in all four; asymmetry credible in three, marginal
-#    in S2 once log t is in. LOGO targets a new learner, LFO the next block.
+#    in S2 once log t is in.

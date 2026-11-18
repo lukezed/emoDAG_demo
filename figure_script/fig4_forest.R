@@ -31,8 +31,8 @@ plot_specs <- tribble(
   "pop_beta_s",      "&beta;<sup>GP&rarr;G|S</sup>",      "Effects of the GPD",       3,   sd_disc / sd_goal,
   "pop_beta_f",      "&beta;<sup>GP&rarr;G|F</sup>",      "Effects of the GPD",       4,   sd_disc / sd_goal,
   "pop_beta_gp_e",   "&beta;<sup>GP&rarr;E</sup>",        "Effects of the GPD",       5,   sd_disc / sd_emo,
-  "pop_beta_e_p",    "&beta;<sup>E&rarr;P</sup>",         "Effects of Emotions",      6,   sd_emo  / sd_perf,
-  "pop_beta_e_g",    "&beta;<sup>E&rarr;G</sup>",         "Effects of Emotions",      7,   sd_emo  / sd_goal
+  "pop_beta_e_p",    "&beta;<sup>E&rarr;P</sup>",         "Effects of Affect",      6,   sd_emo  / sd_perf,
+  "pop_beta_e_g",    "&beta;<sup>E&rarr;G</sup>",         "Effects of Affect",      7,   sd_emo  / sd_goal
 )
 
 # ============================================================================
@@ -90,7 +90,7 @@ draws_std <- raw_draws |>
     ),
     panel = factor(
       panel,
-      levels = c("Effects of the GPD", "Effects of Emotions")
+      levels = c("Effects of the GPD", "Effects of Affect")
     ),
     model = factor(model, levels = c("Hyp", "Alt1", "Hyp+log t", "Alt1+log t"))
   )
