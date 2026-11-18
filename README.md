@@ -1,6 +1,6 @@
 # emoDAG_demo
 
-Code and results for "Does Positive Affect Impair Subsequent Performance? A Practice Confound in Two Learning Studies" (Zhang, under review).
+Code and results for "Does Positive Affect Impair Subsequent Performance? A Practice Confound in Two Learning Studies" (under review).
 
 The manuscript refits the computational model of goals, performance, and affect of Lin et al. (2026) to both of their datasets, adds practice terms (log of the episode number) to each equation, compares the models by leave-one-group-out (LOGO) cross-validation, and uses simulation to test whether omitting the practice terms biases the affect-to-performance path.
 
